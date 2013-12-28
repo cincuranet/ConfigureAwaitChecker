@@ -138,6 +138,20 @@ namespace ConfigureAwaitChecker.Tests
         }
 
         [Test]
+        public void SimpleLambdaWithBraces_Missing()
+        {
+            var result = CreateChecker<SimpleLambdaWithBraces_Missing>().Check().ToArray();
+            Assert.IsFalse(result[0].HasConfigureAwaitFalse);
+        }
+
+        [Test]
+        public void SimpleLambdWithaBraces_Fine()
+        {
+            var result = CreateChecker<SimpleLambdaWithBraces_Fine>().Check().ToArray();
+            Assert.IsTrue(result[0].HasConfigureAwaitFalse);
+        }
+
+        [Test]
         public void ExecutingAsyncLambda_MissingAll()
         {
             var result = CreateChecker<ExecutingAsyncLambda_MissingAll>().Check().ToArray();
@@ -164,12 +178,6 @@ namespace ConfigureAwaitChecker.Tests
             var result = CreateChecker<ExecutingAsyncLambda_Fine>().Check().ToArray();
             Assert.IsTrue(result[0].HasConfigureAwaitFalse);
             Assert.IsTrue(result[1].HasConfigureAwaitFalse);
-        }
-
-        public void FooBar()
-        {
-            //var func3 = (Func<Task>)(async () => await (Task.Delay(1)));
-            //var func4 = (Func<Task>)(async () => await (Task.Delay(1)).ConfigureAwait(false));
         }
     }
 }

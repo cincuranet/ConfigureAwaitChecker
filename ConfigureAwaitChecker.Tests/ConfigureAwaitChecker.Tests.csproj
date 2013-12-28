@@ -59,7 +59,13 @@
     <Compile Include="TestClasses\ExecutingAsyncLambda_MissingOuter.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestClasses\SimpleLambdaWithBraces_Fine.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestClasses\SimpleLambda_Fine.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="TestClasses\SimpleLambdaWithBraces_Missing.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="TestClasses\SimpleLambda_Missing.cs">
