@@ -137,15 +137,39 @@ namespace ConfigureAwaitChecker.Tests
             Assert.IsTrue(result[0].HasConfigureAwaitFalse);
         }
 
+        [Test]
+        public void ExecutingAsyncLambda_MissingAll()
+        {
+            var result = CreateChecker<ExecutingAsyncLambda_MissingAll>().Check().ToArray();
+            Assert.IsFalse(result[0].HasConfigureAwaitFalse);
+            Assert.IsFalse(result[1].HasConfigureAwaitFalse);
+        }
+        [Test]
+        public void ExecutingAsyncLambda_MissingInner()
+        {
+            var result = CreateChecker<ExecutingAsyncLambda_MissingInner>().Check().ToArray();
+            Assert.IsTrue(result[0].HasConfigureAwaitFalse);
+            Assert.IsFalse(result[1].HasConfigureAwaitFalse);
+        }
+        [Test]
+        public void ExecutingAsyncLambda_MissingOuter()
+        {
+            var result = CreateChecker<ExecutingAsyncLambda_MissingOuter>().Check().ToArray();
+            Assert.IsFalse(result[0].HasConfigureAwaitFalse);
+            Assert.IsTrue(result[1].HasConfigureAwaitFalse);
+        }
+        [Test]
+        public void ExecutingAsyncLambda_Fine()
+        {
+            var result = CreateChecker<ExecutingAsyncLambda_Fine>().Check().ToArray();
+            Assert.IsTrue(result[0].HasConfigureAwaitFalse);
+            Assert.IsTrue(result[1].HasConfigureAwaitFalse);
+        }
+
         public void FooBar()
         {
             //var func3 = (Func<Task>)(async () => await (Task.Delay(1)));
             //var func4 = (Func<Task>)(async () => await (Task.Delay(1)).ConfigureAwait(false));
-
-            //await ((Func<Task>)(async () => await Task.Delay(1)))();
-            //await ((Func<Task>)(async () => await Task.Delay(1)))().ConfigureAwait(false);
-            //await ((Func<Task>)(async () => await Task.Delay(1).ConfigureAwait(false)))();
-            //await ((Func<Task>)(async () => await Task.Delay(1).ConfigureAwait(false)))().ConfigureAwait(false);
         }
     }
 }

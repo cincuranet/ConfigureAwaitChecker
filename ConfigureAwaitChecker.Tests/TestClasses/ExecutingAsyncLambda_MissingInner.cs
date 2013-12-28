@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ConfigureAwaitChecker.Tests.TestClasses
 {
-    public class NestedFunctionCalls_MissingOuter : TestClassBase
+    public class ExecutingAsyncLambda_MissingInner : TestClassBase
     {
         public async Task FooBar()
         {
-            await F(await Bool().ConfigureAwait(false));
+            await ((Func<Task>)(async () => await Task.Delay(1)))().ConfigureAwait(false);
         }
     }
 }
