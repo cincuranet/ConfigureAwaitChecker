@@ -145,7 +145,7 @@ namespace ConfigureAwaitChecker.Tests
         }
 
         [Test]
-        public void SimpleLambdWithaBraces_Fine()
+        public void SimpleLambdWithBraces_Fine()
         {
             var result = CreateChecker<SimpleLambdaWithBraces_Fine>().Check().ToArray();
             Assert.IsTrue(result[0].HasConfigureAwaitFalse);
