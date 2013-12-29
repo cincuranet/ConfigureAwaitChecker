@@ -32,9 +32,9 @@ namespace ConfigureAwaitChecker
                 if (item.Kind == SyntaxKind.IdentifierName && item.ToString().Equals("await", StringComparison.Ordinal))
                 {
                     var node = FindInterestingNode(item);
-                    var check = CheckConfigureAwait(node);
-                    var positionStart = node.GetLocation().GetLineSpan(true).StartLinePosition;
-                    var positionEnd = node.GetLocation().GetLineSpan(true).EndLinePosition;
+                    var check = node != null && CheckConfigureAwait(node);
+                    var positionStart = item.GetLocation().GetLineSpan(true).StartLinePosition;
+                    var positionEnd = item.GetLocation().GetLineSpan(true).EndLinePosition;
                     var line = positionEnd.Line + 1;
                     var column = positionEnd.Character + 1;
                     yield return new CheckerResult(check, line, column);
@@ -44,59 +44,27 @@ namespace ConfigureAwaitChecker
 
         static SyntaxNode FindInterestingNode(SyntaxNode node)
         {
-            return FindArgumentInteresting(node)
-                ?? FindLocalInteresting(node)
-                ?? FindExpressionInteresting(node);
+            return FindNodeRec(node.Parent, node);
         }
-
-        static SyntaxNode FindLocalStart(SyntaxNode node)
-        {
-            if (node is LocalDeclarationStatementSyntax)
-                return node;
-            if (node.Parent != null)
-                return FindLocalStart(node.Parent);
-            return null;
-        }
-        static SyntaxNode FindLocalInteresting(SyntaxNode node)
-        {
-            var startNode = FindLocalStart(node);
-            if (startNode != null)
-            {
-                return startNode.Parent.ChildNodes().SkipWhile(n => n != startNode).Skip(1).First();
-            }
-            return null;
-        }
-
-        static SyntaxNode FindExpressionInterestingStart(SyntaxNode node)
+        static SyntaxNode FindNodeRec(SyntaxNode node, SyntaxNode start)
         {
             if (node is StatementSyntax)
-                return node;
-            if (node.Parent != null)
-                return FindExpressionInterestingStart(node.Parent);
-            return null;
-        }
-        static SyntaxNode FindExpressionInteresting(SyntaxNode node)
-        {
-            var startNode = FindExpressionInterestingStart(node);
-            return startNode;
-        }
-
-        static SyntaxNode FindArgumentInterestingStart(SyntaxNode node)
-        {
-            if (node is ArgumentSyntax)
-                return node;
-            if (node.Parent != null)
-                return FindArgumentInterestingStart(node.Parent);
-            return null;
-        }
-        static SyntaxNode FindArgumentInteresting(SyntaxNode node)
-        {
-            var startNode = FindArgumentInterestingStart(node);
-            if (startNode != null)
             {
-                return startNode.Parent.ChildNodes().SkipWhile(n => n != startNode).Skip(1).First();
+                if (node is ExpressionStatementSyntax)
+                    return node;
+                var nodes = node.Parent.DescendantNodes().ToArray();
+                var index = Array.FindIndex(nodes, n => n == start);
+                var result = nodes.Skip(index + 1).First(n => n is ExpressionStatementSyntax);
+                return result;
             }
-            return null;
+            else if (node.Parent != null)
+            {
+                return FindNodeRec(node.Parent, start);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         static bool CheckConfigureAwait(SyntaxNode node)
