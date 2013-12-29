@@ -139,7 +139,11 @@ namespace ConfigureAwaitChecker
             var result = new StringBuilder();
             foreach (var node in nodes)
             {
-                result.AppendFormat("{0}{1}:{2}", indent, node.Kind, (node.Kind == SyntaxKind.IdentifierName || node.Kind == SyntaxKind.ExpressionStatement ? node.ToString() : string.Empty));
+                result.AppendFormat("{0}{1}:[{3}]|{2}",
+                    indent,
+                    node.Kind,
+                    node.ToString(),
+                    node.Span);
                 result.AppendLine();
                 result.Append(DebugListNodes(node.ChildNodes(), indent + "  "));
             }
