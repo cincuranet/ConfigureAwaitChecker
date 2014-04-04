@@ -1,121 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ConfigureAwaitChecker
 {
-    public sealed class Checker
-    {
-        static readonly ParseOptions ParseOptions = new ParseOptions(
-                languageVersion: LanguageVersion.CSharp5,
-                parseDocumentationComments: false);
+	public sealed class Checker
+	{
+		static readonly CSharpParseOptions ParseOptions = new CSharpParseOptions(
+				languageVersion: LanguageVersion.CSharp5,
+				documentationMode: DocumentationMode.None,
+				kind: SourceCodeKind.Regular);
 
-        SyntaxTree _tree;
+		SyntaxTree _tree;
 
-        public Checker(string file)
-        {
-            _tree = SyntaxTree.ParseFile(file, ParseOptions);
-        }
+		public Checker(string file)
+		{
+			_tree = CSharpSyntaxTree.ParseFile(file,
+				options: ParseOptions);
+		}
 
-        public string DebugListTree()
-        {
-            return DebugListNodes(_tree.GetRoot().ChildNodes());
-        }
+		public string DebugListTree()
+		{
+			return DebugListNodes(_tree.GetRoot().ChildNodes());
+		}
 
-        public IEnumerable<CheckerResult> Check()
-        {
-            foreach (var item in _tree.GetRoot().DescendantNodes())
-            {
-                if (item.Kind == SyntaxKind.IdentifierName && item.ToString().Equals("await", StringComparison.Ordinal))
-                {
-                    var node = FindInterestingNode(item);
-                    var check = node != null && CheckConfigureAwait(node);
-                    var positionStart = item.GetLocation().GetLineSpan(true).StartLinePosition;
-                    var positionEnd = item.GetLocation().GetLineSpan(true).EndLinePosition;
-                    var line = positionEnd.Line + 1;
-                    var column = positionEnd.Character + 1;
-                    yield return new CheckerResult(check, line, column);
-                }
-            }
-        }
+		public IEnumerable<CheckerResult> Check()
+		{
+			foreach (var item in _tree.GetRoot().DescendantNodesAndTokens())
+			{
+				if (item.CSharpKind() == SyntaxKind.AwaitExpression)
+				{
+					var awaitNode = item.AsNode();
+					var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
+					var good = IsProperConfigureAwait(possibleConfigureAwait);
+					var line = awaitNode.GetLocation().GetMappedLineSpan();
+					yield return new CheckerResult(good, line.StartLinePosition.Line, line.StartLinePosition.Character);
+				}
+			}
+		}
 
-        static SyntaxNode FindInterestingNode(SyntaxNode node)
-        {
-            return FindNodeRec(node.Parent, node);
-        }
-        static SyntaxNode FindNodeRec(SyntaxNode node, SyntaxNode start)
-        {
-            if (node is StatementSyntax)
-            {
-                if (node is ExpressionStatementSyntax)
-                    return node;
-                var nodes = node.Parent.DescendantNodes().ToArray();
-                var index = Array.FindIndex(nodes, n => n == start);
-                var result = nodes.Skip(index + 1).First(n => n is ExpressionStatementSyntax);
-                return result;
-            }
-            else if (node.Parent != null)
-            {
-                return FindNodeRec(node.Parent, start);
-            }
-            else
-            {
-                return null;
-            }
-        }
+		static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)
+		{
+			foreach (var item in node.ChildNodes())
+			{
+				if (item is InvocationExpressionSyntax)
+					return (InvocationExpressionSyntax)item;
+				return FindExpressionForConfigureAwait(item);
+			}
+			return null;
+		}
 
-        static bool CheckConfigureAwait(SyntaxNode node)
-        {
-            var enumerator = node.DescendantNodes().GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                var item = enumerator.Current;
-                if (item.Kind == SyntaxKind.IdentifierName && item.ToString().Equals("ConfigureAwait", StringComparison.Ordinal))
-                {
-                    if (enumerator.MoveNext())
-                    {
-                        var item2 = enumerator.Current;
-                        if (item2.Kind == SyntaxKind.ArgumentList)
-                        {
-                            if (enumerator.MoveNext())
-                            {
-                                var item3 = enumerator.Current;
-                                if (item3.Kind == SyntaxKind.Argument)
-                                {
-                                    if (enumerator.MoveNext())
-                                    {
-                                        var item4 = enumerator.Current;
-                                        if (item4.Kind == SyntaxKind.FalseLiteralExpression)
-                                        {
-                                            return true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
-        }
+		static bool IsProperConfigureAwait(InvocationExpressionSyntax invocationExpression)
+		{
+			return IsConfigureAwait(invocationExpression.Expression) && HasFalseArgument(invocationExpression.ArgumentList);
+		}
 
-        static string DebugListNodes(IEnumerable<SyntaxNode> nodes, string indent = "")
-        {
-            var result = new StringBuilder();
-            foreach (var node in nodes)
-            {
-                result.AppendFormat("{0}{1}:[{3}]|{2}",
-                    indent,
-                    node.Kind,
-                    node.ToString(),
-                    node.Span);
-                result.AppendLine();
-                result.Append(DebugListNodes(node.ChildNodes(), indent + "  "));
-            }
-            return result.ToString();
-        }
-    }
+		static bool IsConfigureAwait(ExpressionSyntax expression)
+		{
+			var memberAccess = expression as MemberAccessExpressionSyntax;
+			if (memberAccess == null)
+				return false;
+			if (!memberAccess.Name.Identifier.Text.Equals("ConfigureAwait", StringComparison.InvariantCulture))
+				return false;
+			return true;
+		}
+
+		static bool HasFalseArgument(ArgumentListSyntax argumentList)
+		{
+			if (argumentList.Arguments.Count != 1)
+				return false;
+			if (argumentList.Arguments[0].Expression.CSharpKind() != SyntaxKind.FalseLiteralExpression)
+				return false;
+			return true;
+		}
+
+		static string DebugListNodes(IEnumerable<SyntaxNode> nodes, string indent = "")
+		{
+			var result = new StringBuilder();
+			foreach (var node in nodes)
+			{
+				result.AppendFormat("{0}{1}:[{3}]|{2}",
+					indent,
+					node.CSharpKind(),
+					node.ToString(),
+					node.Span);
+				result.AppendLine();
+				result.Append(DebugListNodes(node.ChildNodes(), indent + "  "));
+			}
+			return result.ToString();
+		}
+	}
 }
