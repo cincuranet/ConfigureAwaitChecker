@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace ConfigureAwaitChecker
+namespace ConfigureAwaitChecker.Lib
 {
 	public sealed class Checker
 	{

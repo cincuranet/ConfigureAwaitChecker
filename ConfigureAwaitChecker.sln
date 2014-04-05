@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Tests", "ConfigureAwaitChecker.Tests\ConfigureAwaitChecker.Tests.csproj", "{7C1F0B11-8E95-4FA8-9A56-C38443574EBE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Lib", "ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj", "{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7C1F0B11-8E95-4FA8-9A56-C38443574EBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C1F0B11-8E95-4FA8-9A56-C38443574EBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C1F0B11-8E95-4FA8-9A56-C38443574EBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
