@@ -22,11 +22,6 @@ namespace ConfigureAwaitChecker.Lib
 				options: ParseOptions);
 		}
 
-		public string DebugListTree()
-		{
-			return DebugListNodes(_tree.GetRoot().ChildNodes());
-		}
-
 		public IEnumerable<CheckerResult> Check()
 		{
 			foreach (var item in _tree.GetRoot().DescendantNodesAndTokens())
@@ -40,6 +35,11 @@ namespace ConfigureAwaitChecker.Lib
 					yield return new CheckerResult(good, line.StartLinePosition.Line, line.StartLinePosition.Character);
 				}
 			}
+		}
+
+		public string DebugListTree()
+		{
+			return DebugListNodes(_tree.GetRoot().ChildNodes());
 		}
 
 		static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)
