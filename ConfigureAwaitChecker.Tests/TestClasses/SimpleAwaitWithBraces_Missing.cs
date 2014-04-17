@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using ConfigureAwaitChecker.Tests.TestClasses;
 
-namespace ConfigureAwaitChecker.Tests.TestClasses
+public class SimpleAwaitWithBraces_Missing : TestClassBase
 {
-    public class SimpleAwaitWithBraces_Missing : TestClassBase
-    {
-        public async Task FooBar()
-        {
-            await (Task.Delay(1));
-        }
-    }
+	public async Task FooBar()
+	{
+		await (Task.Delay(1));
+	}
 }
