@@ -60,6 +60,12 @@ namespace ConfigureAwaitChecker.Tests
 			var result = Check<SimpleAwait_Fine>();
 			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
 		}
+		[Test]
+		public void SimpleAwait_WithTrue()
+		{
+			var result = Check<SimpleAwait_WithTrue>();
+			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
+		}
 
 		[Test]
 		public void SimpleAwaitWithBraces_Missing()

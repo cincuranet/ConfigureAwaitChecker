@@ -54,6 +54,9 @@
     <Compile Include="TestClasses\ExecutingAsyncLambda_MissingOuter.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="TestClasses\SimpleAwait_WithTrue.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestClasses\SimpleLambdaWithBraces_Fine.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
