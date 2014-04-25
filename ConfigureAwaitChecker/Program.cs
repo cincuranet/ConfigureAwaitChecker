@@ -23,12 +23,12 @@ namespace ConfigureAwaitChecker
 			{
 				if (!item.HasConfigureAwaitFalse)
 				{
-					Console.Error.WriteLine("ERROR: Missing 'ConfigureAwait(false)' for await on line {0} column {1}.", item.Line, item.Column);
+					Console.WriteLine("ERROR: Missing 'ConfigureAwait(false)' for await on line {0} column {1}.", item.Line, item.Column);
 					result = ExitCodes.Error;
 				}
 				else
 				{
-					Console.Out.WriteLine("Good. Found 'ConfigureAwait(false)' for await on line {0} column {1}.", item.Line, item.Column);
+					Console.WriteLine("Good. Found 'ConfigureAwait(false)' for await on line {0} column {1}.", item.Line, item.Column);
 				}
 			}
 
