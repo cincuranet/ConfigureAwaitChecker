@@ -29,9 +29,9 @@ namespace ConfigureAwaitChecker.Lib
 				if (item.CSharpKind() == SyntaxKind.AwaitExpression)
 				{
 					var awaitNode = item.AsNode();
-					var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
-					var good = IsProperConfigureAwait(possibleConfigureAwait);
 					var line = awaitNode.GetLocation().GetMappedLineSpan();
+					var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
+					var good = possibleConfigureAwait != null && IsProperConfigureAwait(possibleConfigureAwait);
 					yield return new CheckerResult(good, line.StartLinePosition.Line, line.StartLinePosition.Character);
 				}
 			}
