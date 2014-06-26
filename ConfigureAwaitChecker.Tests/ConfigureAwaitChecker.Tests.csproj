@@ -42,6 +42,12 @@
     <Compile Include="CheckerTests.cs" />
     <Compile Include="Scratchpad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestClasses\AwaitOnAwaiter_Missing.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="TestClasses\AwaitOnAwaiter_Fine.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="TestClasses\ExecutingAsyncLambda_Fine.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
