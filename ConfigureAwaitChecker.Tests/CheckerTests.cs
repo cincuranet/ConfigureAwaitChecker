@@ -221,5 +221,19 @@ namespace ConfigureAwaitChecker.Tests
 			var result = Check<AwaitOnAwaiter_Fine>();
 			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
 		}
+
+		[Test]
+		public void ThrowAwait_Missing()
+		{
+			var result = Check<ThrowAwait_Missing>();
+			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
+		}
+
+		[Test]
+		public void ThrowAwait_Fine()
+		{
+			var result = Check<ThrowAwait_Fine>();
+			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
+		}
 	}
 }

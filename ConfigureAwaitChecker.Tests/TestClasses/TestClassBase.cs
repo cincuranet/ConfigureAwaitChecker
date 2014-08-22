@@ -27,5 +27,10 @@ namespace ConfigureAwaitChecker.Tests.TestClasses
         {
             return F(default(IEnumerable<object>));
         }
+
+		protected Task<Exception> Exception()
+		{
+			return F(new Exception());
+		}
     }
 }
