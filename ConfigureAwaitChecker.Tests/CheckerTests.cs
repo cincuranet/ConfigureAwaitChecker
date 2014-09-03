@@ -14,24 +14,11 @@ namespace ConfigureAwaitChecker.Tests
 	[TestFixture]
 	public class CheckerTests
 	{
-		static string File(string className)
+		static Checker CreateChecker(Type testClass)
 		{
-			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase), "TestClasses", string.Format("{0}.cs", className));
-			return location.Replace(@"file:\", string.Empty);
-		}
-
-		static Checker CreateChecker<T>() where T : TestClassBase
-		{
-			return new Checker(File(typeof(T).Name));
-		}
-
-		static CheckerResult[] Check<T>() where T : TestClassBase
-		{
-			var checker = CreateChecker<T>();
-			Debug.WriteLine(checker.DebugListTree());
-			var result = CreateChecker<T>().Check().ToArray();
-			Console.WriteLine(Dump(result));
-			return result;
+			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase), "TestClasses", string.Format("{0}.cs", testClass.Name));
+			location = location.Replace(@"file:\", string.Empty);
+			return new Checker(location);
 		}
 
 		static string Dump(IEnumerable<CheckerResult> results)
@@ -48,192 +35,41 @@ namespace ConfigureAwaitChecker.Tests
 			return sb.ToString();
 		}
 
-		[Test]
-		public void SimpleAwait_Missing()
+		[TestCase(typeof(SimpleAwait_Missing), ExpectedResult = new[] { false })]
+		[TestCase(typeof(SimpleAwait_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(SimpleAwait_WithTrue), ExpectedResult = new[] { false })]
+		[TestCase(typeof(SimpleAwaitWithBraces_Missing), ExpectedResult = new[] { false })]
+		[TestCase(typeof(SimpleAwaitWithBracesAll_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(SimpleAwaitWithBracesTask_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitInIf_Missing), ExpectedResult = new[] { false })]
+		[TestCase(typeof(AwaitInIf_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitInUsing_Missing), ExpectedResult = new[] { false })]
+		[TestCase(typeof(AwaitInUsing_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(CallOnResult_Missing), ExpectedResult = new[] { false })]
+		[TestCase(typeof(CallOnResult_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(NestedFunctionCalls_MissingAll), ExpectedResult = new[] { false, false })]
+		[TestCase(typeof(NestedFunctionCalls_MissingInner), ExpectedResult = new[] { true, false })]
+		[TestCase(typeof(NestedFunctionCalls_MissingOuter), ExpectedResult = new[] { false, true })]
+		[TestCase(typeof(NestedFunctionCalls_Fine), ExpectedResult = new[] { true, true })]
+		[TestCase(typeof(SimpleLambda_Missing), ExpectedResult = new[] { false })]
+		[TestCase(typeof(SimpleLambda_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(SimpleLambdaWithBraces_Missing), ExpectedResult = new[] { false })]
+		[TestCase(typeof(SimpleLambdaWithBraces_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(ExecutingAsyncLambda_MissingAll), ExpectedResult = new[] { false, false })]
+		[TestCase(typeof(ExecutingAsyncLambda_MissingInner), ExpectedResult = new[] { true, false })]
+		[TestCase(typeof(ExecutingAsyncLambda_MissingOuter), ExpectedResult = new[] { false, true })]
+		[TestCase(typeof(ExecutingAsyncLambda_Fine), ExpectedResult = new[] { true, true })]
+		[TestCase(typeof(AwaitOnAwaiter_Missing), ExpectedResult = new[] { false })]
+		[TestCase(typeof(AwaitOnAwaiter_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(ThrowAwait_Missing), ExpectedResult = new[] { false })]
+		[TestCase(typeof(ThrowAwait_Fine), ExpectedResult = new[] { true })]
+		public bool[] Test(Type testClass)
 		{
-			var result = Check<SimpleAwait_Missing>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void SimpleAwait_Fine()
-		{
-			var result = Check<SimpleAwait_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void SimpleAwait_WithTrue()
-		{
-			var result = Check<SimpleAwait_WithTrue>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void SimpleAwaitWithBraces_Missing()
-		{
-			var result = Check<SimpleAwaitWithBraces_Missing>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void SimpleAwaitWithBracesAll_Fine()
-		{
-			var result = Check<SimpleAwaitWithBracesAll_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void SimpleAwaitWithBracesTask_Fine()
-		{
-			var result = Check<SimpleAwaitWithBracesTask_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void AwaitInIf_Missing()
-		{
-			var result = Check<AwaitInIf_Missing>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void AwaitInIf_Fine()
-		{
-			var result = Check<AwaitInIf_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void AwaitInUsing_Missing()
-		{
-			var result = Check<AwaitInUsing_Missing>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void AwaitInUsing_Fine()
-		{
-			var result = Check<AwaitInUsing_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void CallOnResult_Missing()
-		{
-			var result = Check<CallOnResult_Missing>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void CallOnResult_Fine()
-		{
-			var result = Check<CallOnResult_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void NestedFunctionCalls_MissingAll()
-		{
-			var result = Check<NestedFunctionCalls_MissingAll>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-			Assert.IsFalse(result[1].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void NestedFunctionCalls_MissingInner()
-		{
-			var result = Check<NestedFunctionCalls_MissingInner>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-			Assert.IsFalse(result[1].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void NestedFunctionCalls_MissingOuter()
-		{
-			var result = Check<NestedFunctionCalls_MissingOuter>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-			Assert.IsTrue(result[1].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void NestedFunctionCalls_Fine()
-		{
-			var result = Check<NestedFunctionCalls_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-			Assert.IsTrue(result[1].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void SimpleLambda_Missing()
-		{
-			var result = Check<SimpleLambda_Missing>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void SimpleLambda_Fine()
-		{
-			var result = Check<SimpleLambda_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void SimpleLambdaWithBraces_Missing()
-		{
-			var result = Check<SimpleLambdaWithBraces_Missing>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void SimpleLambdaWithBraces_Fine()
-		{
-			var result = Check<SimpleLambdaWithBraces_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void ExecutingAsyncLambda_MissingAll()
-		{
-			var result = Check<ExecutingAsyncLambda_MissingAll>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-			Assert.IsFalse(result[1].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void ExecutingAsyncLambda_MissingInner()
-		{
-			var result = Check<ExecutingAsyncLambda_MissingInner>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-			Assert.IsFalse(result[1].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void ExecutingAsyncLambda_MissingOuter()
-		{
-			var result = Check<ExecutingAsyncLambda_MissingOuter>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-			Assert.IsTrue(result[1].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void ExecutingAsyncLambda_Fine()
-		{
-			var result = Check<ExecutingAsyncLambda_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-			Assert.IsTrue(result[1].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void AwaitOnAwaiter_Missing()
-		{
-			var result = Check<AwaitOnAwaiter_Missing>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-		[Test]
-		public void AwaitOnAwaiter_Fine()
-		{
-			var result = Check<AwaitOnAwaiter_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void ThrowAwait_Missing()
-		{
-			var result = Check<ThrowAwait_Missing>();
-			Assert.IsFalse(result[0].HasConfigureAwaitFalse);
-		}
-
-		[Test]
-		public void ThrowAwait_Fine()
-		{
-			var result = Check<ThrowAwait_Fine>();
-			Assert.IsTrue(result[0].HasConfigureAwaitFalse);
+			var checker = CreateChecker(testClass);
+			Debug.WriteLine(checker.DebugListTree());
+			var result = checker.Check().ToArray();
+			Console.WriteLine(Dump(result));
+			return result.Select(x => x.HasConfigureAwaitFalse).ToArray();
 		}
 	}
 }
