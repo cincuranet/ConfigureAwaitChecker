@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using ConfigureAwaitChecker.Lib;
 
-namespace ConfigureAwaitChecker
+namespace ConfigureAwaitChecker.Console
 {
 	class Program
 	{
@@ -37,10 +37,10 @@ namespace ConfigureAwaitChecker
 
 		static void ConsoleWriteLine(string format, ConsoleColor foregroundColor, params object[] args)
 		{
-			var oldForegroundColor = Console.ForegroundColor;
-			Console.ForegroundColor = foregroundColor;
-			Console.WriteLine(format, args);
-			Console.ForegroundColor = oldForegroundColor;
+			var oldForegroundColor = System.Console.ForegroundColor;
+			System.Console.ForegroundColor = foregroundColor;
+			System.Console.WriteLine(format, args);
+			System.Console.ForegroundColor = oldForegroundColor;
 		}
 	}
 

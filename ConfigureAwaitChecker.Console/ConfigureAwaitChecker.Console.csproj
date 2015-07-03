@@ -7,8 +7,8 @@
     <ProjectGuid>{1910A8D9-94ED-4B90-B3B4-525D1F12438E}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConfigureAwaitChecker</RootNamespace>
-    <AssemblyName>ConfigureAwaitChecker</AssemblyName>
+    <RootNamespace>ConfigureAwaitChecker.Console</RootNamespace>
+    <AssemblyName>ConfigureAwaitChecker.Console</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
