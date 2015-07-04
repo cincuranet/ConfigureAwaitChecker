@@ -1,45 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace ConfigureAwaitChecker.Lib
 {
 	public sealed class Checker
 	{
 		static readonly CSharpParseOptions ParseOptions = new CSharpParseOptions(
-				languageVersion: LanguageVersion.CSharp5,
+				languageVersion: LanguageVersion.CSharp6,
 				documentationMode: DocumentationMode.None,
 				kind: SourceCodeKind.Regular);
 
 		SyntaxTree _tree;
 
-		public Checker(string file)
+		public Checker(Stream file)
 		{
-			_tree = CSharpSyntaxTree.ParseFile(file,
-				options: ParseOptions);
+			using (var reader = new StreamReader(file, Encoding.UTF8, true, 16 * 1024, true))
+			{
+				_tree = CSharpSyntaxTree.ParseText(reader.ReadToEnd(),
+					options: ParseOptions);
+			}
 		}
 
 		public IEnumerable<CheckerResult> Check()
 		{
 			foreach (var item in _tree.GetRoot().DescendantNodesAndTokens())
 			{
-				if (item.CSharpKind() == SyntaxKind.AwaitExpression)
+				if (item.IsKind(SyntaxKind.AwaitExpression))
 				{
-					var awaitNode = item.AsNode();
-					var line = awaitNode.GetLocation().GetMappedLineSpan();
-					var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
-					var good = possibleConfigureAwait != null && IsProperConfigureAwait(possibleConfigureAwait);
-					yield return new CheckerResult(good, line.StartLinePosition.Line, line.StartLinePosition.Character);
+					var awaitNode = (AwaitExpressionSyntax)item.AsNode();
+					yield return CheckNode(awaitNode);
 				}
 			}
 		}
 
-		public string DebugListTree()
+		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode)
 		{
-			return DebugListNodes(_tree.GetRoot().ChildNodes());
+			var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
+			var good = possibleConfigureAwait != null && IsProperConfigureAwait(possibleConfigureAwait);
+			return new CheckerResult(good, awaitNode.GetLocation());
 		}
 
 		static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)
@@ -63,7 +66,7 @@ namespace ConfigureAwaitChecker.Lib
 			var memberAccess = expression as MemberAccessExpressionSyntax;
 			if (memberAccess == null)
 				return false;
-			if (!memberAccess.Name.Identifier.Text.Equals("ConfigureAwait", StringComparison.InvariantCulture))
+			if (!memberAccess.Name.Identifier.Text.Equals("ConfigureAwait", StringComparison.Ordinal))
 				return false;
 			return true;
 		}
@@ -72,25 +75,9 @@ namespace ConfigureAwaitChecker.Lib
 		{
 			if (argumentList.Arguments.Count != 1)
 				return false;
-			if (argumentList.Arguments[0].Expression.CSharpKind() != SyntaxKind.FalseLiteralExpression)
+			if (argumentList.Arguments[0].Expression.IsKind(SyntaxKind.FalseLiteralExpression))
 				return false;
 			return true;
-		}
-
-		static string DebugListNodes(IEnumerable<SyntaxNode> nodes, string indent = "")
-		{
-			var result = new StringBuilder();
-			foreach (var node in nodes)
-			{
-				result.AppendFormat("{0}{1}:[{3}]|{2}",
-					indent,
-					node.CSharpKind(),
-					node.ToString(),
-					node.Span);
-				result.AppendLine();
-				result.Append(DebugListNodes(node.ChildNodes(), indent + "  "));
-			}
-			return result.ToString();
 		}
 	}
 }

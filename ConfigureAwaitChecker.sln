@@ -1,13 +1,16 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Console", "ConfigureAwaitChecker.Console\ConfigureAwaitChecker.Console.csproj", "{1910A8D9-94ED-4B90-B3B4-525D1F12438E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Tests", "ConfigureAwaitChecker.Tests\ConfigureAwaitChecker.Tests.csproj", "{7C1F0B11-8E95-4FA8-9A56-C38443574EBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Lib", "ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj", "{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Analyzer", "ConfigureAwaitChecker.Analyzer\ConfigureAwaitChecker.Analyzer.csproj", "{2294167D-0011-4260-A815-E5CB1E8FAA7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Analyzer.Vsix", "ConfigureAwaitChecker.Analyzer.Vsix\ConfigureAwaitChecker.Analyzer.Vsix.csproj", "{F5F54989-B59C-4FB9-91FD-079F0AE00190}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Lib", "ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj", "{1DE731FB-9A9F-41EB-BE93-75544A0ACB9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +26,18 @@ Global
 		{7C1F0B11-8E95-4FA8-9A56-C38443574EBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C1F0B11-8E95-4FA8-9A56-C38443574EBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C1F0B11-8E95-4FA8-9A56-C38443574EBE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F268E6C-3876-4A8A-AA75-C3D7BD4A8DE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2294167D-0011-4260-A815-E5CB1E8FAA7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2294167D-0011-4260-A815-E5CB1E8FAA7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2294167D-0011-4260-A815-E5CB1E8FAA7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2294167D-0011-4260-A815-E5CB1E8FAA7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5F54989-B59C-4FB9-91FD-079F0AE00190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5F54989-B59C-4FB9-91FD-079F0AE00190}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5F54989-B59C-4FB9-91FD-079F0AE00190}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5F54989-B59C-4FB9-91FD-079F0AE00190}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DE731FB-9A9F-41EB-BE93-75544A0ACB9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DE731FB-9A9F-41EB-BE93-75544A0ACB9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DE731FB-9A9F-41EB-BE93-75544A0ACB9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DE731FB-9A9F-41EB-BE93-75544A0ACB9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

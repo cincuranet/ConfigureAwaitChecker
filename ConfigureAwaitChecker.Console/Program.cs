@@ -18,21 +18,29 @@ namespace ConfigureAwaitChecker.Console
 				return ExitCodes.FileNotFound;
 
 			var result = ExitCodes.OK;
-			var checker = new Checker(args[0]);
-			foreach (var item in checker.Check())
+			foreach (var item in CreateChecker(args[0]).Check())
 			{
+				var location = item.Location.GetMappedLineSpan().StartLinePosition;
 				if (!item.HasConfigureAwaitFalse)
 				{
-					ConsoleWriteLine("ERROR: Missing 'ConfigureAwait(false)' for await on line {0} column {1}.", ConsoleColor.Red, item.Line, item.Column);
+					ConsoleWriteLine("ERROR: Missing 'ConfigureAwait(false)' for await on line {0} column {1}.", ConsoleColor.Red, location.Line, location.Character);
 					result = ExitCodes.Error;
 				}
 				else
 				{
-					ConsoleWriteLine("Good. Found 'ConfigureAwait(false)' for await on line {0} column {1}.", ConsoleColor.Green, item.Line, item.Column);
+					ConsoleWriteLine("Good. Found 'ConfigureAwait(false)' for await on line {0} column {1}.", ConsoleColor.Green, location.Line, location.Character);
 				}
 			}
 
 			return result;
+		}
+
+		static Checker CreateChecker(string file)
+		{
+			using (var fileStream = File.OpenRead(file))
+			{
+				return new Checker(fileStream);
+			}
 		}
 
 		static void ConsoleWriteLine(string format, ConsoleColor foregroundColor, params object[] args)

@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.CodeAnalysis;
 
 namespace ConfigureAwaitChecker.Lib
 {
-    public sealed class CheckerResult
+	public sealed class CheckerResult
     {
-        public bool HasConfigureAwaitFalse { get; private set; }
-        public int Line { get; private set; }
-        public int Column { get; private set; }
+        public bool HasConfigureAwaitFalse { get; }
+        public Location Location { get; }
 
-        public CheckerResult(bool hasConfigureAwaitFalse, int line, int column)
+        public CheckerResult(bool hasConfigureAwaitFalse, Location location)
         {
             HasConfigureAwaitFalse = hasConfigureAwaitFalse;
-            Line = line;
-            Column = column;
+			Location = location;
         }
     }
 }
