@@ -8,8 +8,8 @@
     <ProjectGuid>{1DE731FB-9A9F-41EB-BE93-75544A0ACB9B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConfigureAwaitChecker.Lib2</RootNamespace>
-    <AssemblyName>ConfigureAwaitChecker.Lib2</AssemblyName>
+    <RootNamespace>ConfigureAwaitChecker.Lib</RootNamespace>
+    <AssemblyName>ConfigureAwaitChecker.Lib</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
