@@ -16,7 +16,7 @@ namespace ConfigureAwaitChecker.Tests
 	{
 		static Checker CreateChecker(Type testClass)
 		{
-			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase), "TestClasses", string.Format("{0}.cs", testClass.Name));
+			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase), "TestClasses", $"{testClass.Name}.cs");
 			location = location.Replace(@"file:\", string.Empty);
 			using (var file = File.OpenRead(location))
 			{
@@ -30,10 +30,7 @@ namespace ConfigureAwaitChecker.Tests
 			foreach (var item in results)
 			{
 				var location = item.Location.GetMappedLineSpan().StartLinePosition;
-				sb.AppendFormat("Result:{0}\tL:{1,-6}|C:{2}",
-					item.HasConfigureAwaitFalse,
-					location.Line,
-					location.Character);
+				sb.Append($"Result:{item.HasConfigureAwaitFalse}\tL:{location.Line,-6}|C:{location.Character}");
 				sb.AppendLine();
 			}
 			return sb.ToString();

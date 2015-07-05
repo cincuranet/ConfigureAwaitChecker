@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using ConfigureAwaitChecker.Lib;
 
 namespace ConfigureAwaitChecker.Console
@@ -10,7 +9,7 @@ namespace ConfigureAwaitChecker.Console
 	{
 		static int Main(string[] args)
 		{
-			if (args.Count() != 1)
+			if (args.Count() <= 1)
 				return ExitCodes.TooFewArguments;
 			if (string.IsNullOrWhiteSpace(args[0]))
 				return ExitCodes.ArgumentEmpty;
@@ -23,12 +22,12 @@ namespace ConfigureAwaitChecker.Console
 				var location = item.Location.GetMappedLineSpan().StartLinePosition;
 				if (!item.HasConfigureAwaitFalse)
 				{
-					ConsoleWriteLine("ERROR: Missing 'ConfigureAwait(false)' for await on line {0} column {1}.", ConsoleColor.Red, location.Line, location.Character);
+					ConsoleWriteLine($"ERROR: Missing `ConfigureAwait(false)` for await on line {location.Line} column {location.Character}.", ConsoleColor.Red);
 					result = ExitCodes.Error;
 				}
 				else
 				{
-					ConsoleWriteLine("Good. Found 'ConfigureAwait(false)' for await on line {0} column {1}.", ConsoleColor.Green, location.Line, location.Character);
+					ConsoleWriteLine($"GOOD: Found `ConfigureAwait(false)` for await on line {location.Line} column {location.Character}.", ConsoleColor.Green);
 				}
 			}
 
@@ -43,21 +42,12 @@ namespace ConfigureAwaitChecker.Console
 			}
 		}
 
-		static void ConsoleWriteLine(string format, ConsoleColor foregroundColor, params object[] args)
+		static void ConsoleWriteLine(string message, ConsoleColor foregroundColor)
 		{
 			var oldForegroundColor = System.Console.ForegroundColor;
 			System.Console.ForegroundColor = foregroundColor;
-			System.Console.WriteLine(format, args);
+			System.Console.WriteLine(message);
 			System.Console.ForegroundColor = oldForegroundColor;
 		}
-	}
-
-	static class ExitCodes
-	{
-		public const int OK = 0;
-		public const int Error = 1;
-		public const int TooFewArguments = 101;
-		public const int ArgumentEmpty = 102;
-		public const int FileNotFound = 103;
 	}
 }
