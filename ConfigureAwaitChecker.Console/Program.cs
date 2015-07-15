@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ConfigureAwaitChecker.Analyzer;
+using System;
 using System.IO;
 using System.Linq;
-using ConfigureAwaitChecker.Lib;
 
 namespace ConfigureAwaitChecker.Console
 {

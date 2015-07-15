@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using ConfigureAwaitChecker.Lib;
-using ConfigureAwaitChecker.Tests.TestClasses;
 using NUnit.Framework;
+using ConfigureAwaitChecker.Analyzer;
 
 namespace ConfigureAwaitChecker.Tests
 {

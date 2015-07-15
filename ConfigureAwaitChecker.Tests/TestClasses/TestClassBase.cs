@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ConfigureAwaitChecker.Tests.TestClasses
 {
-    public abstract class TestClassBase
+	public abstract class TestClassBase
     {
         protected Task<T> F<T>(T value)
         {

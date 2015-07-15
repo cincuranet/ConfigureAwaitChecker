@@ -1,9 +1,8 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace ConfigureAwaitChecker.Tests
 {
-    [TestFixture]
+	[TestFixture]
     public class Scratchpad
     {
     }
