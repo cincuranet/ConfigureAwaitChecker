@@ -10,6 +10,8 @@ namespace ConfigureAwaitChecker.Lib
 {
 	public sealed class Checker
 	{
+		public static readonly string ConfigureAwaitIdentifier = "ConfigureAwait";
+
 		static readonly CSharpParseOptions ParseOptions = new CSharpParseOptions(
 				languageVersion: LanguageVersion.CSharp6,
 				documentationMode: DocumentationMode.None,
@@ -45,7 +47,7 @@ namespace ConfigureAwaitChecker.Lib
 			return new CheckerResult(good, awaitNode.GetLocation());
 		}
 
-		static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)
+		public static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)
 		{
 			foreach (var item in node.ChildNodes())
 			{
@@ -56,28 +58,28 @@ namespace ConfigureAwaitChecker.Lib
 			return null;
 		}
 
-		static bool IsProperConfigureAwait(InvocationExpressionSyntax invocationExpression)
-		{
-			return IsConfigureAwait(invocationExpression.Expression) && HasFalseArgument(invocationExpression.ArgumentList);
-		}
-
-		static bool IsConfigureAwait(ExpressionSyntax expression)
+		public static bool IsConfigureAwait(ExpressionSyntax expression)
 		{
 			var memberAccess = expression as MemberAccessExpressionSyntax;
 			if (memberAccess == null)
 				return false;
-			if (!memberAccess.Name.Identifier.Text.Equals("ConfigureAwait", StringComparison.Ordinal))
+			if (!memberAccess.Name.Identifier.Text.Equals(ConfigureAwaitIdentifier, StringComparison.Ordinal))
 				return false;
 			return true;
 		}
 
-		static bool HasFalseArgument(ArgumentListSyntax argumentList)
+		public static bool HasFalseArgument(ArgumentListSyntax argumentList)
 		{
 			if (argumentList.Arguments.Count != 1)
 				return false;
-			if (argumentList.Arguments[0].Expression.IsKind(SyntaxKind.FalseLiteralExpression))
+			if (!argumentList.Arguments[0].Expression.IsKind(SyntaxKind.FalseLiteralExpression))
 				return false;
 			return true;
+		}
+
+		static bool IsProperConfigureAwait(InvocationExpressionSyntax invocationExpression)
+		{
+			return IsConfigureAwait(invocationExpression.Expression) && HasFalseArgument(invocationExpression.ArgumentList);
 		}
 	}
 }

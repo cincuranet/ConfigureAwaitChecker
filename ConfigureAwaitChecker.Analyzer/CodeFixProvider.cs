@@ -12,6 +12,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
+using ConfigureAwaitChecker.Lib;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace ConfigureAwaitChecker.Analyzer
 {
@@ -30,7 +32,45 @@ namespace ConfigureAwaitChecker.Analyzer
 
 		public override async Task RegisterCodeFixesAsync(CodeFixContext context)
 		{
-#warning Not done yet
+			var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+			var diagnostic = context.Diagnostics.First();
+			var node = (AwaitExpressionSyntax)root.FindNode(diagnostic.Location.SourceSpan);
+			context.RegisterCodeFix(
+				   CodeAction.Create("Correct to `ConfigureAwait(false)`", c => Fix(context.Document, node, c)),
+				   diagnostic);
+		}
+
+		static async Task<Document> Fix(Document document, AwaitExpressionSyntax node, CancellationToken cancellationToken)
+		{
+			var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+			var expression = Checker.FindExpressionForConfigureAwait(node);
+			if (expression != null)
+			{
+				if (!Checker.IsConfigureAwait(expression.Expression))
+				{
+					var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
+					var newExpression = SyntaxFactory.InvocationExpression(
+						SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, expression, SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
+						SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
+					return document.WithSyntaxRoot(root.ReplaceNode(expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
+				}
+				if (!Checker.HasFalseArgument(expression.ArgumentList))
+				{
+					var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
+					var newExpression = SyntaxFactory.InvocationExpression(expression.Expression,
+						SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
+					return document.WithSyntaxRoot(root.ReplaceNode(expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
+				}
+			}
+			else
+			{
+				var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
+				var newExpression = SyntaxFactory.InvocationExpression(
+					SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, node.Expression, SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
+					SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
+				return document.WithSyntaxRoot(root.ReplaceNode(node.Expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
+			}
+			throw new InvalidOperationException();
 		}
 	}
 }
