@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>ConfigureAwaitChecker.Analyzer</id>
-    <version>1.0.0-beta1</version>
-    <title>ConfigureAwaitChecker.Analyzer</title>
+    <id>ConfigureAwaitChecker</id>
+    <version>0.0.0.0</version>
+    <title>ConfigureAwaitChecker</title>
     <authors>Jiří Činčura</authors>
     <owners>Jiří Činčura</owners>
     <projectUrl>https://github.com/cincuranet/ConfigureAwaitChecker</projectUrl>
@@ -11,9 +11,9 @@
     <description>
 			Checks for `ConfigureAwait(false)` usage.
 
-			More info: http://blog.cincura.net/id/233476/ .
+			More info: http://blog.cincura.net/id/233513/ and http://blog.cincura.net/id/233476/ .
 		</description>
-    <tags>ConfigureAwaitChecker.Analyzer, analyzers, async, await</tags>
+    <tags>ConfigureAwaitChecker, analyzers, async, await, configureawait</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System" targetFramework="" />
     </frameworkAssemblies>
