@@ -30,10 +30,13 @@ namespace ConfigureAwaitChecker.Analyzer
 		{
 			var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 			var diagnostic = context.Diagnostics.First();
-			var node = (AwaitExpressionSyntax)root.FindNode(diagnostic.Location.SourceSpan);
-			context.RegisterCodeFix(
-				   CodeAction.Create("Correct to `ConfigureAwait(false)`", c => Fix(context.Document, node, c)),
-				   diagnostic);
+			var node = root.FindNode(diagnostic.Location.SourceSpan) as AwaitExpressionSyntax;
+			if (node != null)
+			{
+				context.RegisterCodeFix(
+					   CodeAction.Create("Correct to `ConfigureAwait(false)`", c => Fix(context.Document, node, c)),
+					   diagnostic);
+			}
 		}
 
 		static async Task<Document> Fix(Document document, AwaitExpressionSyntax node, CancellationToken cancellationToken)
