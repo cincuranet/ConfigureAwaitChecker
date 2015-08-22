@@ -12,7 +12,7 @@ namespace ConfigureAwaitChecker.Analyzer
 		public const string DiagnosticId = "ConfigureAwaitChecker";
 
 		static readonly string Title = "CAC001";
-		static readonly string MessageFormat = "Possibly missing `ConfigureAwait(false)` call.";
+		static readonly string MessageFormat = "Possibly missing `ConfigureAwait(false)` call";
 		const string Category = "Code";
 
 		static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
