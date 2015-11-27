@@ -14,6 +14,7 @@ Checks for `ConfigureAwait(false)` usage.
 More info: http://blog.cincura.net/id/233523/ and http://blog.cincura.net/id/233476/ .
 		</description>
 		<tags>ConfigureAwaitChecker, analyzers, async, await, configureawait</tags>
+		<developmentDependency>true</developmentDependency>
 		<frameworkAssemblies>
 			<frameworkAssembly assemblyName="System" targetFramework="" />
 		</frameworkAssemblies>
