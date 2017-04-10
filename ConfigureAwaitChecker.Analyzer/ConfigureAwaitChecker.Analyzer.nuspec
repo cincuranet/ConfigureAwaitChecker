@@ -9,7 +9,7 @@
 		<projectUrl>https://github.com/cincuranet/ConfigureAwaitChecker</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>
-Checks for `ConfigureAwait(false)` usage.
+Checks for `ConfigureAwait(true|false)` usage.
 
 More info: http://blog.cincura.net/id/233523/ and http://blog.cincura.net/id/233476/ .
 		</description>

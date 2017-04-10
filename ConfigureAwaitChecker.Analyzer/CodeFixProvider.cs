@@ -34,7 +34,7 @@ namespace ConfigureAwaitChecker.Analyzer
 			if (node != null)
 			{
 				context.RegisterCodeFix(
-					   CodeAction.Create("Correct to `ConfigureAwait(false)`", c => Fix(context.Document, node, c)),
+					   CodeAction.Create("Correct to `ConfigureAwait(true|false)`", c => Fix(context.Document, node, c)),
 					   diagnostic);
 			}
 		}
@@ -50,13 +50,6 @@ namespace ConfigureAwaitChecker.Analyzer
 					var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
 					var newExpression = SyntaxFactory.InvocationExpression(
 						SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, expression, SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
-						SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
-					return document.WithSyntaxRoot(root.ReplaceNode(expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
-				}
-				if (!Checker.HasFalseArgument(expression.ArgumentList))
-				{
-					var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
-					var newExpression = SyntaxFactory.InvocationExpression(expression.Expression,
 						SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
 					return document.WithSyntaxRoot(root.ReplaceNode(expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
 				}

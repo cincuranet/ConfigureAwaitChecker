@@ -20,14 +20,14 @@ namespace ConfigureAwaitChecker.Console
 			foreach (var item in CreateChecker(args[0]).Check())
 			{
 				var location = item.Location.GetMappedLineSpan().StartLinePosition;
-				if (!item.HasConfigureAwaitFalse)
+				if (!item.HasConfigureAwaitExpression)
 				{
-					ConsoleWriteLine($"ERROR: Missing `ConfigureAwait(false)` for await on line {location.Line} column {location.Character}.", ConsoleColor.Red);
+					ConsoleWriteLine($"ERROR: Missing `ConfigureAwait(true|false)` for await on line {location.Line} column {location.Character}.", ConsoleColor.Red);
 					result = ExitCodes.Error;
 				}
 				else
 				{
-					ConsoleWriteLine($"GOOD: Found `ConfigureAwait(false)` for await on line {location.Line} column {location.Character}.", ConsoleColor.Green);
+					ConsoleWriteLine($"GOOD: Found `ConfigureAwait(true|false)` for await on line {location.Line} column {location.Character}.", ConsoleColor.Green);
 				}
 			}
 
