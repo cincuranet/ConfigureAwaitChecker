@@ -3,7 +3,7 @@
 	<Metadata>
 		<Identity Id="ConfigureAwaitChecker" Version="1.0" Language="en-US" Publisher="Jiri"/>
 		<DisplayName>ConfigureAwaitChecker.Analyzer</DisplayName>
-		<Description xml:space="preserve">Checks for `ConfigureAwait(false)` usage.
+		<Description xml:space="preserve">Checks for `ConfigureAwait(true|false)` usage.
 
 More info: http://blog.cincura.net/id/233476/ .</Description>
 		<Tags>ConfigureAwaitChecker.Analyzer, analyzers, async, await</Tags>

@@ -28,7 +28,7 @@ namespace ConfigureAwaitChecker.Tests
 			foreach (var item in results)
 			{
 				var location = item.Location.GetMappedLineSpan().StartLinePosition;
-				sb.Append($"Result:{item.HasConfigureAwaitFalse}\tL:{location.Line,-6}|C:{location.Character}");
+				sb.Append($"Result:{item.HasConfigureAwaitExpression}\tL:{location.Line,-6}|C:{location.Character}");
 				sb.AppendLine();
 			}
 			return sb.ToString();
@@ -36,7 +36,7 @@ namespace ConfigureAwaitChecker.Tests
 
 		[TestCase(typeof(SimpleAwait_Missing), ExpectedResult = new[] { false })]
 		[TestCase(typeof(SimpleAwait_Fine), ExpectedResult = new[] { true })]
-		[TestCase(typeof(SimpleAwait_WithTrue), ExpectedResult = new[] { false })]
+		[TestCase(typeof(SimpleAwait_WithTrue), ExpectedResult = new[] { true })]
 		[TestCase(typeof(SimpleAwaitWithBraces_Missing), ExpectedResult = new[] { false })]
 		[TestCase(typeof(SimpleAwaitWithBracesAll_Fine), ExpectedResult = new[] { true })]
 		[TestCase(typeof(SimpleAwaitWithBracesTask_Fine), ExpectedResult = new[] { true })]
@@ -67,7 +67,7 @@ namespace ConfigureAwaitChecker.Tests
 			var checker = CreateChecker(testClass);
 			var result = checker.Check().ToArray();
 			Console.WriteLine(Dump(result));
-			return result.Select(x => x.HasConfigureAwaitFalse).ToArray();
+			return result.Select(x => x.HasConfigureAwaitExpression).ToArray();
 		}
 	}
 }
