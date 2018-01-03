@@ -30,7 +30,7 @@ namespace ConfigureAwaitChecker.Analyzer
 		{
 			var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 			var diagnostic = context.Diagnostics.First();
-			if (root.FindNode(diagnostic.Location.SourceSpan) is AwaitExpressionSyntax node)
+			if (root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is AwaitExpressionSyntax node)
 			{
 				context.RegisterCodeFix(
 					CodeAction.Create("Correct to `ConfigureAwait(false)`", c => Fix(context.Document, node, c)),
