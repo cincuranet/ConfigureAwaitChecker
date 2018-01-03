@@ -33,8 +33,8 @@ namespace ConfigureAwaitChecker.Analyzer
 			if (root.FindNode(diagnostic.Location.SourceSpan) is AwaitExpressionSyntax node)
 			{
 				context.RegisterCodeFix(
-					   CodeAction.Create("Correct to `ConfigureAwait(false)`", c => Fix(context.Document, node, c)),
-					   diagnostic);
+					CodeAction.Create("Correct to `ConfigureAwait(false)`", c => Fix(context.Document, node, c)),
+					diagnostic);
 			}
 		}
 
