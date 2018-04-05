@@ -20,7 +20,7 @@ namespace ConfigureAwaitChecker.Console
 			foreach (var item in CreateChecker(args[0]).Check())
 			{
 				var location = item.Location.GetMappedLineSpan().StartLinePosition;
-				if (!item.HasConfigureAwaitFalse)
+				if (!item.HasConfigureAwait)
 				{
 					ConsoleWriteLine($"ERROR: Missing `ConfigureAwait(false)` for await on line {location.Line} column {location.Character}.", ConsoleColor.Red);
 					result = ExitCodes.Error;

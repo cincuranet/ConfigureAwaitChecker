@@ -4,12 +4,12 @@ namespace ConfigureAwaitChecker.Analyzer
 {
 	public sealed class CheckerResult
     {
-        public bool HasConfigureAwaitFalse { get; }
+        public bool HasConfigureAwait { get; }
         public Location Location { get; }
 
-        public CheckerResult(bool hasConfigureAwaitFalse, Location location)
+        public CheckerResult(bool hasConfigureAwait, Location location)
         {
-            HasConfigureAwaitFalse = hasConfigureAwaitFalse;
+            HasConfigureAwait = hasConfigureAwait;
 			Location = location;
         }
     }

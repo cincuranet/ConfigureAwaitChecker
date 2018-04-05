@@ -52,7 +52,7 @@ namespace ConfigureAwaitChecker.Analyzer
 						SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
 					return document.WithSyntaxRoot(root.ReplaceNode(expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
 				}
-				if (!Checker.HasFalseArgument(expression.ArgumentList))
+				if (!Checker.HasBoolArgument(expression.ArgumentList))
 				{
 					var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
 					var newExpression = SyntaxFactory.InvocationExpression(expression.Expression,

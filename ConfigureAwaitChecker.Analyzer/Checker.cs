@@ -43,7 +43,7 @@ namespace ConfigureAwaitChecker.Analyzer
 		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode)
 		{
 			var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
-			var good = possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression) && HasFalseArgument(possibleConfigureAwait.ArgumentList);
+			var good = possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression) && HasBoolArgument(possibleConfigureAwait.ArgumentList);
 			return new CheckerResult(good, awaitNode.GetLocation());
 		}
 
@@ -68,13 +68,15 @@ namespace ConfigureAwaitChecker.Analyzer
 			return true;
 		}
 
-		public static bool HasFalseArgument(ArgumentListSyntax argumentList)
+		public static bool HasBoolArgument(ArgumentListSyntax argumentList)
 		{
 			if (argumentList.Arguments.Count != 1)
 				return false;
-			if (!argumentList.Arguments[0].Expression.IsKind(SyntaxKind.FalseLiteralExpression))
-				return false;
-			return true;
+
+			var expression = argumentList.Arguments[0].Expression;
+
+			return expression.IsKind(SyntaxKind.FalseLiteralExpression) ||
+			       expression.IsKind(SyntaxKind.TrueLiteralExpression);
 		}
 	}
 }
