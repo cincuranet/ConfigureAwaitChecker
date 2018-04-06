@@ -44,7 +44,7 @@ namespace ConfigureAwaitChecker.Analyzer
 			var expression = Checker.FindExpressionForConfigureAwait(node);
 			if (expression != null)
 			{
-				if (!Checker.IsConfigureAwait(expression.Expression))
+				if (!Checker.HasConfigureAwait(node))
 				{
 					var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
 					var newExpression = SyntaxFactory.InvocationExpression(

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using ConfigureAwaitChecker.Analyzer;
 
@@ -14,11 +15,23 @@ namespace ConfigureAwaitChecker.Tests
 	{
 		static Checker CreateChecker(Type testClass)
 		{
-			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase), "TestClasses", $"{testClass.Name}.cs");
-			location = location.Replace(@"file:\", string.Empty);
-			using (var file = File.OpenRead(location))
+			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestClasses");
+
+			var testLocation = Path.Combine(location, $"{testClass.Name}.cs");
+			var baseTestLocation = Path.Combine(location, "TestClassBase.cs");
+
+			using (var testFile = File.OpenRead(testLocation))
+			using (var baseTestFile = File.OpenRead(baseTestLocation))
 			{
-				return new Checker(file);
+				var checker = new Checker(testFile, new[]
+				{
+					typeof(object).Assembly.Location,
+					typeof(Enumerable).Assembly.Location
+				});
+
+				checker.AddFile(baseTestFile);
+
+				return checker;
 			}
 		}
 
@@ -62,6 +75,8 @@ namespace ConfigureAwaitChecker.Tests
 		[TestCase(typeof(AwaitOnAwaiter_Fine), ExpectedResult = new[] { true })]
 		[TestCase(typeof(ThrowAwait_Missing), ExpectedResult = new[] { false })]
 		[TestCase(typeof(ThrowAwait_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitTaskYield), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitTaskYieldAsField), ExpectedResult = new[] { true })]
 		public bool[] Test(Type testClass)
 		{
 			var checker = CreateChecker(testClass);

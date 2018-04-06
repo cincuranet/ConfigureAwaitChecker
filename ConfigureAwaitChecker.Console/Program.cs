@@ -1,5 +1,6 @@
 ﻿using ConfigureAwaitChecker.Analyzer;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -16,8 +17,10 @@ namespace ConfigureAwaitChecker.Console
 			if (!File.Exists(args[0]))
 				return ExitCodes.FileNotFound;
 
+			var mscorlib = typeof(object).Assembly.Location;
+
 			var result = ExitCodes.OK;
-			foreach (var item in CreateChecker(args[0]).Check())
+			foreach (var item in CreateChecker(args[0], new [] {mscorlib}).Check())
 			{
 				var location = item.Location.GetMappedLineSpan().StartLinePosition;
 				if (!item.HasConfigureAwait)
@@ -34,11 +37,11 @@ namespace ConfigureAwaitChecker.Console
 			return result;
 		}
 
-		static Checker CreateChecker(string file)
+		static Checker CreateChecker(string file, IReadOnlyList<string> referenceLocations)
 		{
 			using (var fileStream = File.OpenRead(file))
 			{
-				return new Checker(fileStream);
+				return new Checker(fileStream, referenceLocations);
 			}
 		}
 
