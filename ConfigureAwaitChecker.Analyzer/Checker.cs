@@ -18,33 +18,74 @@ namespace ConfigureAwaitChecker.Analyzer
 				kind: SourceCodeKind.Regular);
 
 		SyntaxTree _tree;
+		private CSharpCompilation _compilation;
 
-		public Checker(Stream file)
+		public Checker(Stream file, IReadOnlyList<string> referenceLocations)
+		{
+			_compilation = CSharpCompilation.Create("ConfigureAwaitCheck");
+
+			foreach (var referenceLocation in referenceLocations)
+			{
+				_compilation = _compilation.AddReferences(MetadataReference.CreateFromFile(referenceLocation));
+			}
+
+			_tree = AddFile(file);
+		}
+
+		public SyntaxTree AddFile(Stream file)
 		{
 			using (var reader = new StreamReader(file, Encoding.UTF8, true, 16 * 1024, true))
 			{
-				_tree = CSharpSyntaxTree.ParseText(reader.ReadToEnd(),
+				var tree = CSharpSyntaxTree.ParseText(reader.ReadToEnd(),
 					options: ParseOptions);
+
+				_compilation = _compilation.AddSyntaxTrees(tree);
+
+				return tree;
 			}
 		}
 
 		public IEnumerable<CheckerResult> Check()
 		{
+			var semanticModel = _compilation.GetSemanticModel(_tree);
+
 			foreach (var item in _tree.GetRoot().DescendantNodesAndTokens())
 			{
 				if (item.IsKind(SyntaxKind.AwaitExpression))
 				{
 					var awaitNode = (AwaitExpressionSyntax)item.AsNode();
-					yield return CheckNode(awaitNode);
+					yield return CheckNode(awaitNode, semanticModel);
 				}
 			}
 		}
 
-		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode)
+		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode, SemanticModel semanticModel)
 		{
-			var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
-			var good = possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression) && HasFalseArgument(possibleConfigureAwait.ArgumentList);
-			return new CheckerResult(good, awaitNode.GetLocation());
+			// Try to find ConfigureAwait in syntax tree without use semantic model first
+			if (HasConfigureAwait(awaitNode))
+			{
+				return new CheckerResult(true, awaitNode.GetLocation());
+			}
+
+			var canConfigureAwait = IsConfigureAwaitExpression(awaitNode.Expression, semanticModel);
+
+			return new CheckerResult(!canConfigureAwait, awaitNode.GetLocation());
+		}
+
+		public static bool HasConfigureAwait(AwaitExpressionSyntax awaitNode)
+		{
+			var expression = FindExpressionForConfigureAwait(awaitNode);
+			if (expression == null)
+				return false;
+
+			var memberAccess = expression.Expression as MemberAccessExpressionSyntax;
+			if (memberAccess == null)
+				return false;
+
+			if (!memberAccess.Name.Identifier.Text.Equals(ConfigureAwaitIdentifier, StringComparison.Ordinal))
+				return false;
+
+			return HasBoolArgument(expression.ArgumentList);
 		}
 
 		public static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)
@@ -58,23 +99,29 @@ namespace ConfigureAwaitChecker.Analyzer
 			return null;
 		}
 
-		public static bool IsConfigureAwait(ExpressionSyntax expression)
+		public static bool IsConfigureAwaitExpression(ExpressionSyntax expression, SemanticModel semanticModel)
 		{
-			var memberAccess = expression as MemberAccessExpressionSyntax;
-			if (memberAccess == null)
+			if (semanticModel == null) throw new ArgumentNullException(nameof(semanticModel));
+
+			var expressionType = semanticModel.GetTypeInfo(expression);
+
+			if (expressionType.Type == null)
+			{
 				return false;
-			if (!memberAccess.Name.Identifier.Text.Equals(ConfigureAwaitIdentifier, StringComparison.Ordinal))
-				return false;
-			return true;
+			}
+
+			return expressionType.Type.GetMembers(ConfigureAwaitIdentifier).Length > 0;
 		}
 
-		public static bool HasFalseArgument(ArgumentListSyntax argumentList)
+		public static bool HasBoolArgument(ArgumentListSyntax argumentList)
 		{
 			if (argumentList.Arguments.Count != 1)
 				return false;
-			if (!argumentList.Arguments[0].Expression.IsKind(SyntaxKind.FalseLiteralExpression))
-				return false;
-			return true;
+
+			var expression = argumentList.Arguments[0].Expression;
+
+			return expression.IsKind(SyntaxKind.FalseLiteralExpression) ||
+			       expression.IsKind(SyntaxKind.TrueLiteralExpression);
 		}
 	}
 }

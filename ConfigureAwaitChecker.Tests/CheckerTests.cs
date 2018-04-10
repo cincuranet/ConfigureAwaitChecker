@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using ConfigureAwaitChecker.Analyzer;
 
@@ -14,11 +15,24 @@ namespace ConfigureAwaitChecker.Tests
 	{
 		static Checker CreateChecker(Type testClass)
 		{
-			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase), "TestClasses", $"{testClass.Name}.cs");
-			location = location.Replace(@"file:\", string.Empty);
-			using (var file = File.OpenRead(location))
+			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestClasses");
+
+			var testLocation = Path.Combine(location, $"{testClass.Name}.cs");
+			var baseTestLocation = Path.Combine(location, "TestClassBase.cs");
+
+			using (var testFile = File.OpenRead(testLocation))
+			using (var baseTestFile = File.OpenRead(baseTestLocation))
 			{
-				return new Checker(file);
+				var checker = new Checker(testFile, new[]
+				{
+					typeof(object).Assembly.Location,
+					typeof(Enumerable).Assembly.Location,
+					typeof(ValueTask<>).Assembly.Location
+				});
+
+				checker.AddFile(baseTestFile);
+
+				return checker;
 			}
 		}
 
@@ -28,7 +42,7 @@ namespace ConfigureAwaitChecker.Tests
 			foreach (var item in results)
 			{
 				var location = item.Location.GetMappedLineSpan().StartLinePosition;
-				sb.Append($"Result:{item.HasConfigureAwaitFalse}\tL:{location.Line,-6}|C:{location.Character}");
+				sb.Append($"Result:{item.HasConfigureAwait}\tL:{location.Line,-6}|C:{location.Character}");
 				sb.AppendLine();
 			}
 			return sb.ToString();
@@ -36,7 +50,7 @@ namespace ConfigureAwaitChecker.Tests
 
 		[TestCase(typeof(SimpleAwait_Missing), ExpectedResult = new[] { false })]
 		[TestCase(typeof(SimpleAwait_Fine), ExpectedResult = new[] { true })]
-		[TestCase(typeof(SimpleAwait_WithTrue), ExpectedResult = new[] { false })]
+		[TestCase(typeof(SimpleAwait_WithTrue), ExpectedResult = new[] { true })]
 		[TestCase(typeof(SimpleAwaitWithBraces_Missing), ExpectedResult = new[] { false })]
 		[TestCase(typeof(SimpleAwaitWithBracesAll_Fine), ExpectedResult = new[] { true })]
 		[TestCase(typeof(SimpleAwaitWithBracesTask_Fine), ExpectedResult = new[] { true })]
@@ -62,12 +76,16 @@ namespace ConfigureAwaitChecker.Tests
 		[TestCase(typeof(AwaitOnAwaiter_Fine), ExpectedResult = new[] { true })]
 		[TestCase(typeof(ThrowAwait_Missing), ExpectedResult = new[] { false })]
 		[TestCase(typeof(ThrowAwait_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitTaskYield), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitTaskYieldAsField), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitValueTask_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitValueTask_Missing), ExpectedResult = new[] { false })]
 		public bool[] Test(Type testClass)
 		{
 			var checker = CreateChecker(testClass);
 			var result = checker.Check().ToArray();
 			Console.WriteLine(Dump(result));
-			return result.Select(x => x.HasConfigureAwaitFalse).ToArray();
+			return result.Select(x => x.HasConfigureAwait).ToArray();
 		}
 	}
 }
