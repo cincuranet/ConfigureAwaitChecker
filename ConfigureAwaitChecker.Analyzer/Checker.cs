@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ConfigureAwaitChecker.Analyzer
 {
@@ -68,10 +67,9 @@ namespace ConfigureAwaitChecker.Analyzer
 				return new CheckerResult(true, awaitNode.GetLocation());
 			}
 
-			var isTask = IsTaskExpression(awaitNode.Expression, semanticModel);
+			var canConfigureAwait = IsConfigureAwaitExpression(awaitNode.Expression, semanticModel);
 
-			// All await on simple tasks should be marked by ConfigureAwait
-			return new CheckerResult(!isTask, awaitNode.GetLocation());
+			return new CheckerResult(!canConfigureAwait, awaitNode.GetLocation());
 		}
 
 		public static bool HasConfigureAwait(AwaitExpressionSyntax awaitNode)
@@ -101,7 +99,7 @@ namespace ConfigureAwaitChecker.Analyzer
 			return null;
 		}
 
-		public static bool IsTaskExpression(ExpressionSyntax expression, SemanticModel semanticModel)
+		public static bool IsConfigureAwaitExpression(ExpressionSyntax expression, SemanticModel semanticModel)
 		{
 			if (semanticModel == null) throw new ArgumentNullException(nameof(semanticModel));
 
@@ -112,19 +110,7 @@ namespace ConfigureAwaitChecker.Analyzer
 				return false;
 			}
 
-			var namedType = (INamedTypeSymbol)expressionType.Type;
-
-			// Is Generic type?
-			if (namedType.Arity != 0)
-			{
-				namedType = namedType.OriginalDefinition;
-			}
-
-			var simpleTask = semanticModel.Compilation.GetTypeByMetadataName(typeof(Task).FullName);
-			var genericTask = semanticModel.Compilation.GetTypeByMetadataName(typeof(Task<>).FullName);
-
-			return namedType.Equals(simpleTask) ||
-			       namedType.Equals(genericTask);
+			return expressionType.Type.GetMembers(ConfigureAwaitIdentifier).Length > 0;
 		}
 
 		public static bool HasBoolArgument(ArgumentListSyntax argumentList)

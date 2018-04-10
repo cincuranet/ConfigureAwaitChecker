@@ -26,7 +26,8 @@ namespace ConfigureAwaitChecker.Tests
 				var checker = new Checker(testFile, new[]
 				{
 					typeof(object).Assembly.Location,
-					typeof(Enumerable).Assembly.Location
+					typeof(Enumerable).Assembly.Location,
+					typeof(ValueTask<>).Assembly.Location
 				});
 
 				checker.AddFile(baseTestFile);
@@ -77,6 +78,8 @@ namespace ConfigureAwaitChecker.Tests
 		[TestCase(typeof(ThrowAwait_Fine), ExpectedResult = new[] { true })]
 		[TestCase(typeof(AwaitTaskYield), ExpectedResult = new[] { true })]
 		[TestCase(typeof(AwaitTaskYieldAsField), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitValueTask_Fine), ExpectedResult = new[] { true })]
+		[TestCase(typeof(AwaitValueTask_Missing), ExpectedResult = new[] { false })]
 		public bool[] Test(Type testClass)
 		{
 			var checker = CreateChecker(testClass);
