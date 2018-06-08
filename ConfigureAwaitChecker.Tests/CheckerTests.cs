@@ -66,7 +66,7 @@ namespace ConfigureAwaitChecker.Tests
 		{
 			var checker = CreateChecker(testClass);
 			var result = checker.Check().ToArray();
-			Console.WriteLine(Dump(result));
+			TestContext.WriteLine(Dump(result));
 			return result.Select(x => x.HasConfigureAwaitFalse).ToArray();
 		}
 	}
