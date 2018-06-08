@@ -1,9 +1,13 @@
-﻿namespace ConfigureAwaitChecker.Tests
+﻿using System.Reflection;
+using NUnitLite;
+
+namespace ConfigureAwaitChecker.Tests
 {
 	class Program
 	{
-		// the project is kept as Exe to have proper binding redirects generated
-		static void Main(string[] args)
-		{ }
+		static int Main(string[] args)
+		{
+			return new AutoRun(Assembly.GetEntryAssembly()).Execute(new[] { "--noresult", "--labels=All" });
+		}
 	}
 }
