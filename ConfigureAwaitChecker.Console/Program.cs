@@ -1,4 +1,4 @@
-﻿using ConfigureAwaitChecker.Analyzer;
+﻿using ConfigureAwaitChecker.Lib;
 using System;
 using System.IO;
 using System.Linq;

@@ -43,8 +43,9 @@ namespace ConfigureAwaitChecker.Lib
 		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode)
 		{
 			var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
-			var good = possibleConfigureAwait != null && IsProperConfigureAwait(possibleConfigureAwait);
-			return new CheckerResult(good, awaitNode.GetLocation());
+			var good = possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression) && HasFalseArgument(possibleConfigureAwait.ArgumentList);
+			var needs = !good;
+			return new CheckerResult(needs, awaitNode.GetLocation());
 		}
 
 		public static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)
@@ -75,11 +76,6 @@ namespace ConfigureAwaitChecker.Lib
 			if (!argumentList.Arguments[0].Expression.IsKind(SyntaxKind.FalseLiteralExpression))
 				return false;
 			return true;
-		}
-
-		static bool IsProperConfigureAwait(InvocationExpressionSyntax invocationExpression)
-		{
-			return IsConfigureAwait(invocationExpression.Expression) && HasFalseArgument(invocationExpression.ArgumentList);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("ConfigureAwaitChecker")]
+[assembly: AssemblyTitle("ConfigureAwaitChecker.Console")]
 [assembly: AssemblyProduct("ConfigureAwaitChecker")]
 [assembly: AssemblyCopyright("Copyright © Jiri Cincura")]
 

@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using ConfigureAwaitChecker.Lib;
 using NUnit.Framework;
-using ConfigureAwaitChecker.Analyzer;
 
 namespace ConfigureAwaitChecker.Tests
 {

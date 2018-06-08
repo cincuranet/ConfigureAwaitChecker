@@ -2,5 +2,5 @@
 Get-ChildItem $directory -Filter *.cs -Recurse | foreach { 
 	$fullName = $_.FullName
 	Write-Output "Checking $fullName."
-	.\ConfigureAwaitChecker.exe $fullName
+	.\ConfigureAwaitChecker.Console.exe $fullName
 }
