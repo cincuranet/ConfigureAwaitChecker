@@ -61,8 +61,7 @@ namespace ConfigureAwaitChecker.Lib
 
 		public static bool IsConfigureAwait(ExpressionSyntax expression)
 		{
-			var memberAccess = expression as MemberAccessExpressionSyntax;
-			if (memberAccess == null)
+			if (!(expression is MemberAccessExpressionSyntax memberAccess))
 				return false;
 			if (!memberAccess.Name.Identifier.Text.Equals(ConfigureAwaitIdentifier, StringComparison.Ordinal))
 				return false;
