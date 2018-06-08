@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigureAwaitChecker.Analy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigureAwaitChecker.Tests", "ConfigureAwaitChecker.Tests\ConfigureAwaitChecker.Tests.csproj", "{0CF332D0-28A4-4723-B0A6-67AFF0D1B179}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigureAwaitChecker.Console", "ConfigureAwaitChecker.Console\ConfigureAwaitChecker.Console.csproj", "{9FA1C574-3AC4-434D-B0BC-877E590730E1}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigureAwaitChecker.Lib", "ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj", "{2C04A066-7928-4A5B-A6C3-5FA855D6B515}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7AA16325-0A47-4E5F-BDEB-5B798A5A584E}"
@@ -30,10 +28,6 @@ Global
 		{0CF332D0-28A4-4723-B0A6-67AFF0D1B179}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CF332D0-28A4-4723-B0A6-67AFF0D1B179}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CF332D0-28A4-4723-B0A6-67AFF0D1B179}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9FA1C574-3AC4-434D-B0BC-877E590730E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9FA1C574-3AC4-434D-B0BC-877E590730E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9FA1C574-3AC4-434D-B0BC-877E590730E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9FA1C574-3AC4-434D-B0BC-877E590730E1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C04A066-7928-4A5B-A6C3-5FA855D6B515}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2C04A066-7928-4A5B-A6C3-5FA855D6B515}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C04A066-7928-4A5B-A6C3-5FA855D6B515}.Release|Any CPU.ActiveCfg = Release|Any CPU
