@@ -44,7 +44,8 @@ namespace ConfigureAwaitChecker.Analyzer
 		{
 			var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
 			var good = possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression) && HasFalseArgument(possibleConfigureAwait.ArgumentList);
-			return new CheckerResult(good, awaitNode.GetLocation());
+			var needs = !good;
+			return new CheckerResult(needs, awaitNode.GetLocation());
 		}
 
 		public static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)

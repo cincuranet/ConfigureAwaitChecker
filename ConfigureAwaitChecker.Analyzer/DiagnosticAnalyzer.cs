@@ -28,7 +28,7 @@ namespace ConfigureAwaitChecker.Analyzer
 		{
 			var awaitNode = (AwaitExpressionSyntax)context.Node;
 			var check = Checker.CheckNode(awaitNode);
-            if (!check.HasConfigureAwaitFalse)
+            if (check.NeedsConfigureAwaitFalse)
 			{
 				var diagnostic = Diagnostic.Create(Rule, check.Location);
 				context.ReportDiagnostic(diagnostic);
