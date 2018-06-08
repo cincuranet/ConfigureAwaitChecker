@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard1.3</TargetFramework>
+		<Title>ConfigureAwaitChecker.Analyzer</Title>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 	<PropertyGroup>
 		<PackageId>ConfigureAwaitChecker.Analyzer</PackageId>
-		<PackageVersion>2.0.0.0</PackageVersion>
+		<PackageVersion>$(Version)</PackageVersion>
 		<Authors>Jiří Činčura</Authors>
 		<PackageProjectUrl>https://github.com/cincuranet/ConfigureAwaitChecker</PackageProjectUrl>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

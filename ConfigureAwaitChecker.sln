@@ -3,13 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Analyzer", "ConfigureAwaitChecker.Analyzer\ConfigureAwaitChecker.Analyzer.csproj", "{7C931E50-A744-41B6-BBDC-E81D4691D51B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigureAwaitChecker.Analyzer", "ConfigureAwaitChecker.Analyzer\ConfigureAwaitChecker.Analyzer.csproj", "{7C931E50-A744-41B6-BBDC-E81D4691D51B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Tests", "ConfigureAwaitChecker.Tests\ConfigureAwaitChecker.Tests.csproj", "{0CF332D0-28A4-4723-B0A6-67AFF0D1B179}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigureAwaitChecker.Tests", "ConfigureAwaitChecker.Tests\ConfigureAwaitChecker.Tests.csproj", "{0CF332D0-28A4-4723-B0A6-67AFF0D1B179}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Console", "ConfigureAwaitChecker.Console\ConfigureAwaitChecker.Console.csproj", "{9FA1C574-3AC4-434D-B0BC-877E590730E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigureAwaitChecker.Console", "ConfigureAwaitChecker.Console\ConfigureAwaitChecker.Console.csproj", "{9FA1C574-3AC4-434D-B0BC-877E590730E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigureAwaitChecker.Lib", "ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj", "{2C04A066-7928-4A5B-A6C3-5FA855D6B515}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigureAwaitChecker.Lib", "ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj", "{2C04A066-7928-4A5B-A6C3-5FA855D6B515}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7AA16325-0A47-4E5F-BDEB-5B798A5A584E}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

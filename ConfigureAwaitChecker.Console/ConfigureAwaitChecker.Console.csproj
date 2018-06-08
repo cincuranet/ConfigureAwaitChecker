@@ -2,12 +2,9 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net471</TargetFramework>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<Title>ConfigureAwaitChecker.Console</Title>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Properties\" />
 	</ItemGroup>
 </Project>
