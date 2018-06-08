@@ -4,22 +4,24 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
+using ConfigureAwaitChecker.Tests.TestClasses;
+using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 
 namespace ConfigureAwaitChecker.Tests
 {
-	[TestFixture]
 	public class CheckerTests
 	{
 		static Checker CreateChecker(Type testClass)
 		{
-			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase), "TestClasses", $"{testClass.Name}.cs");
-			location = location.Replace(@"file:\", string.Empty);
-			using (var file = File.OpenRead(location))
+			var references = new[]
 			{
-				return new Checker(file);
-			}
+				MetadataReference.CreateFromFile(typeof(TestClassBase).Assembly.Location),
+				MetadataReference.CreateFromFile(typeof(Task).Assembly.Location),
+			};
+			return new Checker(references);
 		}
 
 		static string Dump(IEnumerable<CheckerResult> results)
@@ -62,13 +64,17 @@ namespace ConfigureAwaitChecker.Tests
 		[TestCase(typeof(AwaitOnAwaiter_Fine), ExpectedResult = new[] { false })]
 		[TestCase(typeof(ThrowAwait_Missing), ExpectedResult = new[] { true })]
 		[TestCase(typeof(ThrowAwait_Fine), ExpectedResult = new[] { false })]
-		//[TestCase(typeof(AwaitTaskYield_Fine), ExpectedResult = new[] { false })]
+		[TestCase(typeof(AwaitTaskYield_Fine), ExpectedResult = new[] { false })]
 		public bool[] Test(Type testClass)
 		{
-			var checker = CreateChecker(testClass);
-			var result = checker.Check().ToArray();
-			TestContext.WriteLine(Dump(result));
-			return result.Select(x => x.NeedsConfigureAwaitFalse).ToArray();
+			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestClasses", $"{testClass.Name}.cs");
+			using (var file = File.OpenRead(location))
+			{
+				var checker = CreateChecker(testClass);
+				var result = checker.Check(file).ToList();
+				TestContext.WriteLine(Dump(result));
+				return result.Select(x => x.NeedsConfigureAwaitFalse).ToArray();
+			}
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace ConfigureAwaitChecker.Analyzer
 		static void Analyze(SyntaxNodeAnalysisContext context)
 		{
 			var awaitNode = (AwaitExpressionSyntax)context.Node;
-			var check = Checker.CheckNode(awaitNode);
+			var check = Checker.CheckNode(awaitNode, context.SemanticModel);
             if (check.NeedsConfigureAwaitFalse)
 			{
 				var diagnostic = Diagnostic.Create(Rule, check.Location);

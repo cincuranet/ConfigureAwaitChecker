@@ -1,10 +1,10 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ConfigureAwaitChecker.Lib
 {
@@ -13,50 +13,86 @@ namespace ConfigureAwaitChecker.Lib
 		public static readonly string ConfigureAwaitIdentifier = "ConfigureAwait";
 
 		static readonly CSharpParseOptions ParseOptions = new CSharpParseOptions(
-				languageVersion: LanguageVersion.CSharp6,
+				languageVersion: LanguageVersion.Latest,
 				documentationMode: DocumentationMode.None,
 				kind: SourceCodeKind.Regular);
 
-		SyntaxTree _tree;
+		readonly MetadataReference[] _references;
 
-		public Checker(Stream file)
+		public Checker(params MetadataReference[] references)
 		{
-			using (var reader = new StreamReader(file, Encoding.UTF8, true, 16 * 1024, true))
-			{
-				_tree = CSharpSyntaxTree.ParseText(reader.ReadToEnd(),
-					options: ParseOptions);
-			}
+			_references = references;
 		}
 
-		public IEnumerable<CheckerResult> Check()
+		public IEnumerable<CheckerResult> Check(Stream file)
 		{
-			foreach (var item in _tree.GetRoot().DescendantNodesAndTokens())
+			var tree = ParseFile(file);
+			var compilation = CSharpCompilation.Create(nameof(ConfigureAwaitChecker));
+			compilation = compilation.AddReferences(_references);
+			compilation = compilation.AddSyntaxTrees(tree);
+			var semanticModel = compilation.GetSemanticModel(tree);
+			foreach (var item in tree.GetRoot().DescendantNodes())
 			{
 				if (item.IsKind(SyntaxKind.AwaitExpression))
 				{
-					var awaitNode = (AwaitExpressionSyntax)item.AsNode();
-					yield return CheckNode(awaitNode);
+					var awaitNode = (AwaitExpressionSyntax)item;
+					yield return CheckNode(awaitNode, semanticModel);
 				}
 			}
 		}
 
-		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode)
+		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode, SemanticModel semanticModel)
 		{
 			var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
-			var good = possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression) && HasFalseArgument(possibleConfigureAwait.ArgumentList);
-			var needs = !good;
-			return new CheckerResult(needs, awaitNode.GetLocation());
+			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
+			{
+				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
+				{
+					return new CheckerResult(false, awaitNode.GetLocation());
+				}
+				else
+				{
+					return new CheckerResult(true, awaitNode.GetLocation());
+				}
+			}
+			else
+			{
+				var can = CanHaveConfigureAwait(awaitNode.Expression, semanticModel);
+				return new CheckerResult(can, awaitNode.GetLocation());
+			}
 		}
 
 		public static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)
 		{
 			foreach (var item in node.ChildNodes())
 			{
-				if (item is InvocationExpressionSyntax)
-					return (InvocationExpressionSyntax)item;
+				if (item is InvocationExpressionSyntax invocationExpressionSyntax)
+					return invocationExpressionSyntax;
 				return FindExpressionForConfigureAwait(item);
 			}
 			return null;
+		}
+
+		public static bool CanHaveConfigureAwait(ExpressionSyntax expression, SemanticModel semanticModel)
+		{
+			var typeInfo = semanticModel.GetTypeInfo(expression);
+			var type = typeInfo.ConvertedType;
+			if (type == null)
+				return false;
+			var members = type.GetMembers(ConfigureAwaitIdentifier);
+			foreach (var item in members)
+			{
+				if (!(item is IMethodSymbol methodSymbol))
+					break;
+				var parameters = methodSymbol.Parameters;
+				if (parameters.Length != 1)
+					break;
+				if (parameters[0].Type.SpecialType != SpecialType.System_Boolean)
+					break;
+
+				return true;
+			}
+			return false;
 		}
 
 		public static bool IsConfigureAwait(ExpressionSyntax expression)
@@ -75,6 +111,15 @@ namespace ConfigureAwaitChecker.Lib
 			if (!argumentList.Arguments[0].Expression.IsKind(SyntaxKind.FalseLiteralExpression))
 				return false;
 			return true;
+		}
+
+		SyntaxTree ParseFile(Stream file)
+		{
+			using (var reader = new StreamReader(file, Encoding.UTF8, true, 16 * 1024, true))
+			{
+				return CSharpSyntaxTree.ParseText(reader.ReadToEnd(),
+					options: ParseOptions);
+			}
 		}
 	}
 }
