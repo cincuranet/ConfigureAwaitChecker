@@ -26,6 +26,6 @@ More info: https://www.tabsoverspaces.com/id/233523 and https://www.tabsoverspac
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj" />
+		<ProjectReference Include="..\ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj" PrivateAssets="all" />
 	</ItemGroup>
 </Project>
