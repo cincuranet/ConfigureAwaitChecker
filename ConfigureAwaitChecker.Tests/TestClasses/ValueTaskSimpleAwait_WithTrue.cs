@@ -3,11 +3,10 @@ using ConfigureAwaitChecker.Tests;
 using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(new[] { true })]
-public class AwaitOnAwaiter_Missing : TestClassBase
+public class ValueTaskSimpleAwait_WithTrue : TestClassBase
 {
-	public async Task FooBar()
+	public async ValueTask FooBar()
 	{
-		var awaiter = F(6);
-		await awaiter;
+		await ValueTask().ConfigureAwait(true);
 	}
 }

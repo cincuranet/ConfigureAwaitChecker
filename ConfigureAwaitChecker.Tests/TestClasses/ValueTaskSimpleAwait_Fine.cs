@@ -3,10 +3,10 @@ using ConfigureAwaitChecker.Tests;
 using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(new[] { false })]
-public class SimpleAwaitWithBracesAll_Fine : TestClassBase
+public class ValueTaskSimpleAwait_Fine : TestClassBase
 {
-	public async Task FooBar()
+	public async ValueTask FooBar()
 	{
-		await (Task.Delay(1).ConfigureAwait(false));
+		await ValueTask().ConfigureAwait(false);
 	}
 }

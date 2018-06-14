@@ -24,11 +24,16 @@ namespace ConfigureAwaitChecker.Tests.TestClasses
         protected Task<IEnumerable<object>> Enumerable()
         {
             return F(default(IEnumerable<object>));
-        }
+		}
 
 		protected Task<Exception> Exception()
 		{
 			return F(new Exception());
 		}
-    }
+
+		protected ValueTask ValueTask()
+		{
+			return new ValueTask();
+		}
+	}
 }

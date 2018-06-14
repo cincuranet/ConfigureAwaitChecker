@@ -6,6 +6,7 @@
 	<ItemGroup>
 	  <PackageReference Include="NUnit" Version="3.10.1" />
 	  <PackageReference Include="NUnitLite" Version="3.10.1" />
+	  <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj" />
@@ -100,6 +101,15 @@
 		</Compile>
 		<Compile Update="TestClasses\ThrowAwait_Missing.cs">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Compile>
+		<Compile Update="TestClasses\ValueTaskSimpleAwait_Fine.cs">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Compile>
+		<Compile Update="TestClasses\ValueTaskSimpleAwait_Missing.cs">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Compile>
+		<Compile Update="TestClasses\ValueTaskSimpleAwait_WithTrue.cs">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Compile>
 	</ItemGroup>
 </Project>
