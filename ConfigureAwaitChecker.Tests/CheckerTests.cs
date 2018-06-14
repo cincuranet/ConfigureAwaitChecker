@@ -72,7 +72,7 @@ namespace ConfigureAwaitChecker.Tests
 				var start = lineSpan.StartLinePosition;
 				var end = lineSpan.EndLinePosition;
 				string FormatLocation(LinePosition position) => $"{position.Line}:{position.Character}";
-				sb.Append($"Result: {item.NeedsConfigureAwaitFalse} ({FormatLocation(start)} - {FormatLocation(end)})");
+				sb.Append($"Result: {item.NeedsConfigureAwaitFalse} (Loc: {FormatLocation(start)}-{FormatLocation(end)})");
 				sb.AppendLine();
 			}
 			return sb.ToString();
