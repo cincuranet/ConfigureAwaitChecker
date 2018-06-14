@@ -65,11 +65,20 @@ namespace ConfigureAwaitChecker.Analyzer
 			{
 				var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
 				var newExpression = SyntaxFactory.InvocationExpression(
-					SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, node.Expression, SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
+					SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, PrepareNodeExpressionForConfigureAwait(node.Expression), SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
 					SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
 				return document.WithSyntaxRoot(root.ReplaceNode(node.Expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
 			}
 			throw new InvalidOperationException();
+		}
+
+		static ExpressionSyntax PrepareNodeExpressionForConfigureAwait(ExpressionSyntax expression)
+		{
+			if (expression.IsKind(SyntaxKind.CastExpression))
+			{
+				return SyntaxFactory.ParenthesizedExpression(expression);
+			}
+			return expression;
 		}
 	}
 }
