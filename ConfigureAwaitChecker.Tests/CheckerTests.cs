@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests.TestClasses;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using NUnit.Framework;
 
 namespace ConfigureAwaitChecker.Tests
@@ -29,8 +30,11 @@ namespace ConfigureAwaitChecker.Tests
 			var sb = new StringBuilder();
 			foreach (var item in results)
 			{
-				var location = item.Location.GetMappedLineSpan().StartLinePosition;
-				sb.Append($"Result:{item.NeedsConfigureAwaitFalse}\tL:{location.Line,-6}|C:{location.Character}");
+				var lineSpan = item.Location.GetMappedLineSpan();
+				var start = lineSpan.StartLinePosition;
+				var end = lineSpan.EndLinePosition;
+				string FormatLocation(LinePosition position) => $"{position.Line}:{position.Character}";
+				sb.Append($"Result: {item.NeedsConfigureAwaitFalse} ({FormatLocation(start)} - {FormatLocation(end)})");
 				sb.AppendLine();
 			}
 			return sb.ToString();
