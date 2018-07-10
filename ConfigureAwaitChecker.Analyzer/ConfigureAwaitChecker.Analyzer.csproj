@@ -13,7 +13,10 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<Description>Checks for `ConfigureAwait(false)` usage.
 
-More info: https://www.tabsoverspaces.com/id/233523 and https://www.tabsoverspaces.com/id/233476.</Description>
+More info: 
+* https://www.tabsoverspaces.com/id/233523
+* https://www.tabsoverspaces.com/id/233476
+* https://www.tabsoverspaces.com/id/233732</Description>
 		<PackageTags>ConfigureAwaitChecker, analyzers, async, await, configureawait</PackageTags>
 		<NoPackageAnalysis>true</NoPackageAnalysis>
 	</PropertyGroup>
