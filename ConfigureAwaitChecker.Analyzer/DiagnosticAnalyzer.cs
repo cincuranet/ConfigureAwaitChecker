@@ -10,15 +10,16 @@ namespace ConfigureAwaitChecker.Analyzer
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
 	public sealed class ConfigureAwaitCheckerAnalyzer : DiagnosticAnalyzer
 	{
-		public const string DiagnosticId = "ConfigureAwaitChecker";
+		private const string Title = "ConfigureAwaitChecker";
+		public const string AddConfigureAwaitFalseDiagnosticId = "CAC001";
+		public const string SwitchToConfigureAwaitFalseDiagnosticId = "CAC002";
 
-		static readonly string Title = "CAC001";
-		static readonly string MessageFormat = "Possibly missing `ConfigureAwait(false)` call";
-		const string Category = "Code";
+		private const string Category = "Code";
 
-		static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
+		static readonly DiagnosticDescriptor AddConfigureAwaitFalseRule = new DiagnosticDescriptor(AddConfigureAwaitFalseDiagnosticId, Title, "Possibly missing `ConfigureAwait(false)` call", Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
+		static readonly DiagnosticDescriptor SwitchToConfigureAwaitFalseRule = new DiagnosticDescriptor(SwitchToConfigureAwaitFalseDiagnosticId, Title, "Possibly should switch to `ConfigureAwait(false)`", Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
-		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(AddConfigureAwaitFalseRule, SwitchToConfigureAwaitFalseRule); } }
 
 		public override void Initialize(AnalysisContext context)
 		{
@@ -29,9 +30,15 @@ namespace ConfigureAwaitChecker.Analyzer
 		{
 			var awaitNode = (AwaitExpressionSyntax)context.Node;
 			var check = Checker.CheckNode(awaitNode, context.SemanticModel);
-            if (check.NeedsConfigureAwaitFalse)
+			if (check.NeedsAddConfigureAwaitFalse)
 			{
-				var diagnostic = Diagnostic.Create(Rule, check.Location);
+				var diagnostic = Diagnostic.Create(AddConfigureAwaitFalseRule, check.Location);
+				context.ReportDiagnostic(diagnostic);
+			}
+
+			if (check.NeedsSwitchConfigureAwaitToFalse)
+			{
+				var diagnostic = Diagnostic.Create(SwitchToConfigureAwaitFalseRule, check.Location);
 				context.ReportDiagnostic(diagnostic);
 			}
 		}

@@ -2,7 +2,7 @@
 using ConfigureAwaitChecker.Tests;
 using ConfigureAwaitChecker.Tests.TestClasses;
 
-[CheckerTests.ExpectedResult(new[] { true })]
+[CheckerTests.ExpectedResult(new[] { false }, new[] { true })]
 public class SimpleAwait_WithTrue : TestClassBase
 {
 	public async Task FooBar()

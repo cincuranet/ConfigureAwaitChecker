@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using ConfigureAwaitChecker.Tests;
 using ConfigureAwaitChecker.Tests.TestClasses;
 
-[CheckerTests.ExpectedResult(new[] { false })]
+[CheckerTests.ExpectedResult(new[] { false }, new[] { false })]
 public class SimpleLambdaWithBraces_Fine : TestClassBase
 {
 #pragma warning disable 1998

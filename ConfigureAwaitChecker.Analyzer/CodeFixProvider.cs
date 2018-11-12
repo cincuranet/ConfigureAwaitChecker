@@ -19,7 +19,7 @@ namespace ConfigureAwaitChecker.Analyzer
 	{
 		public override ImmutableArray<string> FixableDiagnosticIds
 		{
-			get { return ImmutableArray.Create(ConfigureAwaitCheckerAnalyzer.DiagnosticId); }
+			get { return ImmutableArray.Create(ConfigureAwaitCheckerAnalyzer.AddConfigureAwaitFalseDiagnosticId, ConfigureAwaitCheckerAnalyzer.SwitchToConfigureAwaitFalseDiagnosticId); }
 		}
 
 		public override FixAllProvider GetFixAllProvider()

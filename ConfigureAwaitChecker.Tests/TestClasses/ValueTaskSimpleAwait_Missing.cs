@@ -2,7 +2,7 @@
 using ConfigureAwaitChecker.Tests;
 using ConfigureAwaitChecker.Tests.TestClasses;
 
-[CheckerTests.ExpectedResult(new[] { true })]
+[CheckerTests.ExpectedResult(new[] { true }, new[] { false })]
 public class ValueTaskSimpleAwait_Missing : TestClassBase
 {
 	public async ValueTask FooBar()

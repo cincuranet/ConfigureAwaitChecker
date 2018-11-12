@@ -2,7 +2,7 @@
 using ConfigureAwaitChecker.Tests;
 using ConfigureAwaitChecker.Tests.TestClasses;
 
-[CheckerTests.ExpectedResult(new[] { false, false })]
+[CheckerTests.ExpectedResult(new[] { false, false }, new[] { false, false })]
 public class NestedFunctionCalls_Fine : TestClassBase
 {
 	public async Task FooBar()

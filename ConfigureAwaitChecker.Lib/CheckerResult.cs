@@ -4,12 +4,12 @@ namespace ConfigureAwaitChecker.Lib
 {
 	public sealed class CheckerResult
 	{
-		public bool NeedsConfigureAwaitFalse { get; }
-		public Location Location { get; }
+		public bool NeedsAddConfigureAwaitFalse { get; internal set; }
+		public bool NeedsSwitchConfigureAwaitToFalse { get; internal set; }
+		public Location Location { get; internal set; }
 
-		public CheckerResult(bool needsConfigureAwaitFalse, Location location)
+		public CheckerResult(Location location)
 		{
-			NeedsConfigureAwaitFalse = needsConfigureAwaitFalse;
 			Location = location;
 		}
 	}

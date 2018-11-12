@@ -46,19 +46,11 @@ namespace ConfigureAwaitChecker.Lib
 			var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
 			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
 			{
-				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
-				{
-					return new CheckerResult(false, awaitNode.GetLocation());
-				}
-				else
-				{
-					return new CheckerResult(true, awaitNode.GetLocation());
-				}
+				return new CheckerResult(awaitNode.GetLocation()) { NeedsSwitchConfigureAwaitToFalse = !HasFalseArgument(possibleConfigureAwait.ArgumentList) };
 			}
 			else
 			{
-				var can = CanHaveConfigureAwait(awaitNode.Expression, semanticModel);
-				return new CheckerResult(can, awaitNode.GetLocation());
+				return new CheckerResult(awaitNode.GetLocation()) { NeedsAddConfigureAwaitFalse = CanHaveConfigureAwait(awaitNode.Expression, semanticModel) };
 			}
 		}
 
