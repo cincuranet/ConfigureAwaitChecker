@@ -19,6 +19,7 @@ More info:
 * https://www.tabsoverspaces.com/id/233732</Description>
 		<PackageTags>ConfigureAwaitChecker, analyzers, async, await, configureawait</PackageTags>
 		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<DevelopmentDependency>true</DevelopmentDependency>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Update="NETStandard.Library" PrivateAssets="all" />
