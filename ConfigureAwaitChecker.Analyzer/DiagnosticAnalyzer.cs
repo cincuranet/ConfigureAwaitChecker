@@ -17,7 +17,7 @@ namespace ConfigureAwaitChecker.Analyzer
 		public const string ConfigureAwaitWithTrueId = "CAC002";
 
 		static readonly DiagnosticDescriptor MissingConfigureAwaitFalseRule = new DiagnosticDescriptor(MissingConfigureAwaitFalseId, Title, "Possibly missing `ConfigureAwait(false)` call", Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
-		static readonly DiagnosticDescriptor ConfigureAwaitWithTrueRule = new DiagnosticDescriptor(MissingConfigureAwaitFalseId, Title, "Possibly wrong `ConfigureAwait(true)` call", Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
+		static readonly DiagnosticDescriptor ConfigureAwaitWithTrueRule = new DiagnosticDescriptor(ConfigureAwaitWithTrueId, Title, "Possibly wrong `ConfigureAwait(true)` call", Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(MissingConfigureAwaitFalseRule, ConfigureAwaitWithTrueRule);
 
