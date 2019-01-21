@@ -17,10 +17,7 @@ namespace ConfigureAwaitChecker.Analyzer
 	[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ConfigureAwaitCheckerCodeFixProvider)), Shared]
 	public sealed class ConfigureAwaitCheckerCodeFixProvider : CodeFixProvider
 	{
-		public override ImmutableArray<string> FixableDiagnosticIds
-		{
-			get { return ImmutableArray.Create(ConfigureAwaitCheckerAnalyzer.DiagnosticId); }
-		}
+		public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(ConfigureAwaitCheckerAnalyzer.MissingConfigureAwaitFalseId, ConfigureAwaitCheckerAnalyzer.ConfigureAwaitWithTrueId);
 
 		public override FixAllProvider GetFixAllProvider()
 		{

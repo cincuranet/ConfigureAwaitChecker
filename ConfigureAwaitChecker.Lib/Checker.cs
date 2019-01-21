@@ -43,22 +43,26 @@ namespace ConfigureAwaitChecker.Lib
 
 		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode, SemanticModel semanticModel)
 		{
+			var location = awaitNode.GetLocation();
 			var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
 			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
 			{
 				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
 				{
-					return new CheckerResult(false, awaitNode.GetLocation());
+					return new CheckerResult(CheckerProblem.NoProblem, location);
 				}
 				else
 				{
-					return new CheckerResult(true, awaitNode.GetLocation());
+					return new CheckerResult(CheckerProblem.ConfigureAwaitWithTrue, location);
 				}
 			}
 			else
 			{
 				var can = CanHaveConfigureAwait(awaitNode.Expression, semanticModel);
-				return new CheckerResult(can, awaitNode.GetLocation());
+				var problem = can
+					? CheckerProblem.MissingConfigureAwaitFalse
+					: CheckerProblem.NoProblem;
+				return new CheckerResult(problem, location);
 			}
 		}
 

@@ -10,15 +10,16 @@ namespace ConfigureAwaitChecker.Analyzer
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
 	public sealed class ConfigureAwaitCheckerAnalyzer : DiagnosticAnalyzer
 	{
-		public const string DiagnosticId = "ConfigureAwaitChecker";
-
-		static readonly string Title = "CAC001";
-		static readonly string MessageFormat = "Possibly missing `ConfigureAwait(false)` call";
+		const string Title = "ConfigureAwaitChecker";
 		const string Category = "Code";
 
-		static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
+		public const string MissingConfigureAwaitFalseId = "CAC001";
+		public const string ConfigureAwaitWithTrueId = "CAC002";
 
-		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+		static readonly DiagnosticDescriptor MissingConfigureAwaitFalseRule = new DiagnosticDescriptor(MissingConfigureAwaitFalseId, Title, "Possibly missing `ConfigureAwait(false)` call", Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
+		static readonly DiagnosticDescriptor ConfigureAwaitWithTrueRule = new DiagnosticDescriptor(ConfigureAwaitWithTrueId, Title, "Possibly wrong `ConfigureAwait(true)` call", Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(MissingConfigureAwaitFalseRule, ConfigureAwaitWithTrueRule);
 
 		public override void Initialize(AnalysisContext context)
 		{
@@ -30,10 +31,19 @@ namespace ConfigureAwaitChecker.Analyzer
 		{
 			var awaitNode = (AwaitExpressionSyntax)context.Node;
 			var check = Checker.CheckNode(awaitNode, context.SemanticModel);
-            if (check.NeedsConfigureAwaitFalse)
+			if (check.NeedsFix)
 			{
-				var diagnostic = Diagnostic.Create(Rule, check.Location);
-				context.ReportDiagnostic(diagnostic);
+				switch (check.Problem)
+				{
+					case CheckerProblem.NoProblem:
+						return;
+					case CheckerProblem.MissingConfigureAwaitFalse:
+						context.ReportDiagnostic(Diagnostic.Create(MissingConfigureAwaitFalseRule, check.Location));
+						return;
+					case CheckerProblem.ConfigureAwaitWithTrue:
+						context.ReportDiagnostic(Diagnostic.Create(ConfigureAwaitWithTrueRule, check.Location));
+						return;
+				}
 			}
 		}
 	}
