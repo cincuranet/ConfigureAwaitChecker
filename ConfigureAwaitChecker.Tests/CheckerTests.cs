@@ -18,16 +18,16 @@ namespace ConfigureAwaitChecker.Tests
 		[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 		public sealed class ExpectedResultAttribute : Attribute
 		{
-			public ExpectedResultAttribute(bool[] result)
+			public ExpectedResultAttribute(params CheckerProblem[] result)
 			{
 				Result = result;
 			}
 
-			public bool[] Result { get; }
+			public CheckerProblem[] Result { get; }
 		}
 
 		[TestCaseSource(nameof(TestSource))]
-		public bool[] Test(Type testClass)
+		public CheckerProblem[] Test(Type testClass)
 		{
 			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestClasses", $"{testClass.Name}.cs");
 			using (var file = File.OpenRead(location))
@@ -35,7 +35,7 @@ namespace ConfigureAwaitChecker.Tests
 				var checker = CreateChecker(testClass);
 				var result = checker.Check(file).ToList();
 				TestContext.WriteLine(Dump(result));
-				return result.Select(x => x.NeedsConfigureAwaitFalse).ToArray();
+				return result.Select(x => x.Problem).ToArray();
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace ConfigureAwaitChecker.Tests
 				var start = lineSpan.StartLinePosition;
 				var end = lineSpan.EndLinePosition;
 				string FormatLocation(LinePosition position) => $"{position.Line}:{position.Character}";
-				sb.Append($"Result: {item.NeedsConfigureAwaitFalse} (Loc: {FormatLocation(start)}-{FormatLocation(end)})");
+				sb.Append($"Problem: {item.Problem} (Loc: {FormatLocation(start)}-{FormatLocation(end)})");
 				sb.AppendLine();
 			}
 			return sb.ToString();

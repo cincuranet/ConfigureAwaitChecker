@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
+using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
 using ConfigureAwaitChecker.Tests.TestClasses;
 
-[CheckerTests.ExpectedResult(new[] { false, false })]
+[CheckerTests.ExpectedResult(CheckerProblem.NoProblem, CheckerProblem.NoProblem)]
 public class NestedFunctionCalls_Fine : TestClassBase
 {
 	public async Task FooBar()
