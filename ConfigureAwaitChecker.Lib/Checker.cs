@@ -83,7 +83,7 @@ namespace ConfigureAwaitChecker.Lib
 			var type = typeInfo.ConvertedType;
 			if (type == null)
 				return false;
-			var members = semanticModel.LookupSymbols(expression.SpanStart, type, "ConfigureAwait", true);
+			var members = semanticModel.LookupSymbols(expression.SpanStart, type, ConfigureAwaitIdentifier, true);
 			foreach (var item in members)
 			{
 				if (!(item is IMethodSymbol methodSymbol))
