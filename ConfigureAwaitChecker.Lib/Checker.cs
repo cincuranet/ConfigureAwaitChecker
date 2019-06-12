@@ -87,12 +87,12 @@ namespace ConfigureAwaitChecker.Lib
 			foreach (var item in members)
 			{
 				if (!(item is IMethodSymbol methodSymbol))
-					break;
+					continue;
 				var parameters = methodSymbol.Parameters;
 				if (parameters.Length != 1)
-					break;
+					continue;
 				if (parameters[0].Type.SpecialType != SpecialType.System_Boolean)
-					break;
+					continue;
 
 				return true;
 			}

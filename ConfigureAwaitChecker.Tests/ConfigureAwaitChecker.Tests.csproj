@@ -12,6 +12,12 @@
 		<ProjectReference Include="..\ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<Compile Update="TestClasses\AwaitExtensionWrongAndGoodConfigureAwait_Missing.cs">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Compile>
+		<Compile Update="TestClasses\AwaitExtensionWrongConfigureAwait_Fine.cs">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Compile>
 		<Compile Update="TestClasses\AwaitExtensionConfigureAwait_Fine.cs">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Compile>
