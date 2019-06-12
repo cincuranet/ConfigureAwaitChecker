@@ -1,6 +1,6 @@
-﻿using ConfigureAwaitChecker.Lib;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using ConfigureAwaitChecker.Lib;
 
 namespace ConfigureAwaitChecker.Tests.TestClasses
 {
@@ -18,7 +18,7 @@ namespace ConfigureAwaitChecker.Tests.TestClasses
 		}
 	}
 
-	internal static class AwaitExtensionConfigureAwait_Fine_AwaitableExtensions
+	static class AwaitExtensionConfigureAwait_Fine_AwaitableExtensions
 	{
 		public static ConfiguredTaskAwaitable ConfigureAwait(this AwaitExtensionConfigureAwait_Fine.Awaitable @this, bool continueOnCapturedContext) => default;
 	}

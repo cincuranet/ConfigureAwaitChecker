@@ -1,10 +1,6 @@
-﻿using ConfigureAwaitChecker.Lib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using ConfigureAwaitChecker.Lib;
 
 namespace ConfigureAwaitChecker.Tests.TestClasses
 {
@@ -22,7 +18,7 @@ namespace ConfigureAwaitChecker.Tests.TestClasses
 		}
 	}
 
-	internal static class AwaitExtensionConfigureAwait_Missing_AwaitableExtensions
+	static class AwaitExtensionConfigureAwait_Missing_AwaitableExtensions
 	{
 		public static ConfiguredTaskAwaitable ConfigureAwait(this AwaitExtensionConfigureAwait_Missing.Awaitable @this, bool continueOnCapturedContext) => default;
 	}
