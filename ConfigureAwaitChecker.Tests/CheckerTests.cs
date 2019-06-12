@@ -44,7 +44,7 @@ namespace ConfigureAwaitChecker.Tests
 			var baseType = typeof(TestClassBase);
 			var types = baseType.Assembly.GetTypes();
 			return types
-				.Select(x => ((type: x, result: x.GetCustomAttribute<ExpectedResultAttribute>())))
+				.Select(x => (type: x, result: x.GetCustomAttribute<ExpectedResultAttribute>()))
 				.Where(x => x.result != null)
 				.Select(x => new TestCaseData(x.type)
 				{
