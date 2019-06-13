@@ -4,16 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
-using ConfigureAwaitChecker.Tests.TestClasses;
-using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using NUnit.Framework;
 
 namespace ConfigureAwaitChecker.Tests
 {
-	public class CheckerTests
+	public class CheckerTests : TestsBase
 	{
 		[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 		public sealed class ExpectedResultAttribute : Attribute
@@ -32,7 +30,7 @@ namespace ConfigureAwaitChecker.Tests
 			var location = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestClasses", $"{testClass.Name}.cs");
 			using (var file = File.OpenRead(location))
 			{
-				var checker = CreateChecker(testClass);
+				var checker = new Checker(LanguageVersion.Latest, MetadataReferences);
 				var result = checker.Check(file).ToList();
 				TestContext.WriteLine(Dump(result));
 				return result.Select(x => x.Problem).ToArray();
@@ -41,7 +39,7 @@ namespace ConfigureAwaitChecker.Tests
 
 		static IEnumerable<TestCaseData> TestSource()
 		{
-			var baseType = typeof(TestClassBase);
+			var baseType = typeof(TestsBase);
 			var types = baseType.Assembly.GetTypes();
 			return types
 				.Select(x => (type: x, result: x.GetCustomAttribute<ExpectedResultAttribute>()))
@@ -50,17 +48,6 @@ namespace ConfigureAwaitChecker.Tests
 				{
 					ExpectedResult = x.result.Result
 				});
-		}
-
-		static Checker CreateChecker(Type testClass)
-		{
-			var references = new[]
-			{
-				MetadataReference.CreateFromFile(typeof(TestClassBase).Assembly.Location),
-				MetadataReference.CreateFromFile(typeof(Task).Assembly.Location),
-				MetadataReference.CreateFromFile(typeof(ValueTask).Assembly.Location),
-			};
-			return new Checker(references);
 		}
 
 		static string Dump(IEnumerable<CheckerResult> results)

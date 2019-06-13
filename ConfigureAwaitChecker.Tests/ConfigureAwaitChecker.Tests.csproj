@@ -1,15 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net471</TargetFramework>
+		<TargetFramework>netcoreapp2.2</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="NUnit" Version="3.10.1" />
 		<PackageReference Include="NUnitLite" Version="3.10.1" />
-		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.1" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\ConfigureAwaitChecker.Analyzer\ConfigureAwaitChecker.Analyzer.csproj" />
 		<ProjectReference Include="..\ConfigureAwaitChecker.Lib\ConfigureAwaitChecker.Lib.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="TestClasses\*">

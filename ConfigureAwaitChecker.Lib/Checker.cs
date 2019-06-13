@@ -12,21 +12,18 @@ namespace ConfigureAwaitChecker.Lib
 	{
 		public static readonly string ConfigureAwaitIdentifier = "ConfigureAwait";
 
-		static readonly CSharpParseOptions ParseOptions = new CSharpParseOptions(
-				languageVersion: LanguageVersion.Latest,
-				documentationMode: DocumentationMode.None,
-				kind: SourceCodeKind.Regular);
-
 		readonly MetadataReference[] _references;
+		readonly LanguageVersion _languageVersion;
 
-		public Checker(params MetadataReference[] references)
+		public Checker(LanguageVersion languageVersion, params MetadataReference[] references)
 		{
 			_references = references;
+			_languageVersion = languageVersion;
 		}
 
 		public IEnumerable<CheckerResult> Check(Stream file)
 		{
-			var tree = ParseFile(file);
+			var tree = ParseFile(file, _languageVersion);
 			var compilation = CSharpCompilation.Create(nameof(ConfigureAwaitChecker));
 			compilation = compilation.AddReferences(_references);
 			compilation = compilation.AddSyntaxTrees(tree);
@@ -117,12 +114,15 @@ namespace ConfigureAwaitChecker.Lib
 			return true;
 		}
 
-		SyntaxTree ParseFile(Stream file)
+		static SyntaxTree ParseFile(Stream file, LanguageVersion languageVersion)
 		{
 			using (var reader = new StreamReader(file, Encoding.UTF8, true, 16 * 1024, true))
 			{
 				return CSharpSyntaxTree.ParseText(reader.ReadToEnd(),
-					options: ParseOptions);
+					options: new CSharpParseOptions(
+						languageVersion: languageVersion,
+						documentationMode: DocumentationMode.None,
+						kind: SourceCodeKind.Regular));
 			}
 		}
 	}

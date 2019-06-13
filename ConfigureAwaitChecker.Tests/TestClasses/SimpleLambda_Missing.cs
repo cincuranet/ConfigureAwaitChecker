@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.MissingConfigureAwaitFalse)]
-public class SimpleLambda_Missing : TestClassBase
+[CodeFixTests.TestThis]
+public class SimpleLambda_Missing
 {
 #pragma warning disable 1998
 	public async Task FooBar()

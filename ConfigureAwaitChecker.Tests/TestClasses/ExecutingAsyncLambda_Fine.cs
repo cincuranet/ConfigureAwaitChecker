@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.NoProblem, CheckerProblem.NoProblem)]
-public class ExecutingAsyncLambda_Fine : TestClassBase
+public class ExecutingAsyncLambda_Fine
 {
 	public async Task FooBar()
 	{

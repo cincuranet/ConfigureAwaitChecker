@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.MissingConfigureAwaitFalse)]
-public class AwaitOnAwaiter_Missing : TestClassBase
+[CodeFixTests.TestThis]
+public class AwaitOnAwaiter_Missing
 {
 	public async Task FooBar()
 	{
-		var awaiter = F(6);
+		var awaiter = TestsBase.F(6);
 		await awaiter;
 	}
 }

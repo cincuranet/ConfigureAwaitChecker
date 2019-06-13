@@ -1,21 +1,19 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
+using ConfigureAwaitChecker.Tests;
 
-namespace ConfigureAwaitChecker.Tests.TestClasses
+[CheckerTests.ExpectedResult(CheckerProblem.NoProblem)]
+public class AwaitCustomType_Fine
 {
-	[CheckerTests.ExpectedResult(CheckerProblem.NoProblem)]
-	public class AwaitCustomType_Fine : TestClassBase
+	public async Task FooBar()
 	{
-		public async Task FooBar()
-		{
-			await new Awaitable().ConfigureAwait(false);
-		}
+		await new Awaitable().ConfigureAwait(false);
+	}
 
-		public class Awaitable
-		{
-			public TaskAwaiter GetAwaiter() => default;
-			public ConfiguredTaskAwaitable ConfigureAwait(bool continueOnCapturedContext) => default;
-		}
+	public class Awaitable
+	{
+		public TaskAwaiter GetAwaiter() => default;
+		public ConfiguredTaskAwaitable ConfigureAwait(bool continueOnCapturedContext) => default;
 	}
 }

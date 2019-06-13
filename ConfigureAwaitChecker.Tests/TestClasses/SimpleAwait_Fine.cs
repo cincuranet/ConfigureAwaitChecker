@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.NoProblem)]
-public class SimpleAwait_Fine : TestClassBase
+public class SimpleAwait_Fine
 {
 	public async Task FooBar()
 	{

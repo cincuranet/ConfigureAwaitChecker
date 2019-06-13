@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.MissingConfigureAwaitFalse)]
-public class SimpleAwait_Missing : TestClassBase
+[CodeFixTests.TestThis]
+public class SimpleAwait_Missing
 {
 	public async Task FooBar()
 	{

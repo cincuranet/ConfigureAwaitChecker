@@ -2,13 +2,12 @@
 using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.NoProblem)]
-public class CallOnResult_Fine : TestClassBase
+public class CallOnResult_Fine
 {
 	public async Task FooBar()
 	{
-		var array = (await Enumerable().ConfigureAwait(false)).ToArray();
+		var array = (await TestsBase.Enumerable().ConfigureAwait(false)).ToArray();
 	}
 }

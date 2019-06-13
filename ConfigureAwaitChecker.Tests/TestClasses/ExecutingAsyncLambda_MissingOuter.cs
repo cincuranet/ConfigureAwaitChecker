@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.MissingConfigureAwaitFalse, CheckerProblem.NoProblem)]
-public class ExecutingAsyncLambda_MissingOuter : TestClassBase
+[CodeFixTests.TestThis]
+public class ExecutingAsyncLambda_MissingOuter
 {
 	public async Task FooBar()
 	{

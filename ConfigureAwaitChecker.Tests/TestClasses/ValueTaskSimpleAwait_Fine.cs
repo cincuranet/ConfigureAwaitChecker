@@ -1,13 +1,12 @@
 ﻿using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.NoProblem)]
-public class ValueTaskSimpleAwait_Fine : TestClassBase
+public class ValueTaskSimpleAwait_Fine
 {
 	public async ValueTask FooBar()
 	{
-		await ValueTask().ConfigureAwait(false);
+		await TestsBase.ValueTask().ConfigureAwait(false);
 	}
 }

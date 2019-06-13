@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.MissingConfigureAwaitFalse)]
-public class CallOnResult_Missing : TestClassBase
+[CodeFixTests.TestThis]
+public class CallOnResult_Missing
 {
 	public async Task FooBar()
 	{
-		var array = (await Enumerable()).ToArray();
+		var array = (await TestsBase.Enumerable()).ToArray();
 	}
 }

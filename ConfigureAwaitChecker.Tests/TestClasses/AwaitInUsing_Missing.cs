@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.MissingConfigureAwaitFalse)]
-public class AwaitInUsing_Missing : TestClassBase
+[CodeFixTests.TestThis]
+public class AwaitInUsing_Missing
 {
 	public async Task FooBar()
 	{
-		using (var disposable = await Disposable()) { }
+		using (var disposable = await TestsBase.Disposable()) { }
 	}
 }

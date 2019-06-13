@@ -27,7 +27,7 @@ More info:
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
-		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" />
+		<None Include="$(OutputPath)\ConfigureAwaitChecker.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" />
 		<None Include="$(OutputPath)\ConfigureAwaitChecker.Lib.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" />
 	</ItemGroup>
 	<ItemGroup>

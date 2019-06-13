@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
 using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
-using ConfigureAwaitChecker.Tests.TestClasses;
 
 [CheckerTests.ExpectedResult(CheckerProblem.MissingConfigureAwaitFalse, CheckerProblem.MissingConfigureAwaitFalse)]
-public class NestedFunctionCalls_MissingAll : TestClassBase
+[CodeFixTests.TestThis]
+public class NestedFunctionCalls_MissingAll
 {
 	public async Task FooBar()
 	{
-		await F(await Bool());
+		await TestsBase.F(await TestsBase.Bool());
 	}
 }
