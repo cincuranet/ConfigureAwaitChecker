@@ -58,7 +58,7 @@ namespace ConfigureAwaitChecker.Tests
 				var lineSpan = item.Location.GetMappedLineSpan();
 				var start = lineSpan.StartLinePosition;
 				var end = lineSpan.EndLinePosition;
-				string FormatLocation(LinePosition position) => $"{position.Line}:{position.Character}";
+				static string FormatLocation(LinePosition position) => $"{position.Line}:{position.Character}";
 				sb.Append($"Problem: {item.Problem} (Loc: {FormatLocation(start)}-{FormatLocation(end)})");
 				sb.AppendLine();
 			}
