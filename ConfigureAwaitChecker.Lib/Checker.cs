@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -31,10 +30,34 @@ namespace ConfigureAwaitChecker.Lib
 			var semanticModel = compilation.GetSemanticModel(tree);
 			foreach (var item in tree.GetRoot().DescendantNodes())
 			{
-				if (item.IsKind(SyntaxKind.AwaitExpression))
+				switch (item)
 				{
-					var awaitNode = (AwaitExpressionSyntax)item;
-					yield return CheckNode(awaitNode, semanticModel);
+					case AwaitExpressionSyntax awaitNode:
+						yield return CheckNode(awaitNode, semanticModel);
+						break;
+					case UsingStatementSyntax usingNode:
+						var usingNodeResult = CheckNode(usingNode, semanticModel);
+						if (usingNodeResult != null)
+							yield return usingNodeResult;
+						break;
+					case ForEachStatementSyntax forEachNode:
+						var forEachNodeResult = CheckNode(forEachNode, semanticModel);
+						if (forEachNodeResult != null)
+							yield return forEachNodeResult;
+						break;
+
+				}
+			}
+
+			static SyntaxTree ParseFile(Stream file, LanguageVersion languageVersion)
+			{
+				using (var reader = new StreamReader(file, Encoding.UTF8, true, 16 * 1024, true))
+				{
+					return CSharpSyntaxTree.ParseText(reader.ReadToEnd(),
+						options: new CSharpParseOptions(
+							languageVersion: languageVersion,
+							documentationMode: DocumentationMode.None,
+							kind: SourceCodeKind.Regular));
 				}
 			}
 		}
@@ -42,10 +65,10 @@ namespace ConfigureAwaitChecker.Lib
 		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode, SemanticModel semanticModel)
 		{
 			var location = awaitNode.GetLocation();
-			var (expression, invocation) = FindExpressionForConfigureAwait(awaitNode);
-			if (expression != null && IsConfigureAwait(expression))
+			var (possibleConfigureAwait, node) = FindExpressionFor(awaitNode);
+			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
 			{
-				if (HasFalseArgument(invocation.ArgumentList))
+				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
 				{
 					return new CheckerResult(CheckerProblem.NoProblem, location);
 				}
@@ -56,7 +79,7 @@ namespace ConfigureAwaitChecker.Lib
 			}
 			else
 			{
-				var can = CanHaveConfigureAwait(invocation ?? expression ?? awaitNode.Expression, semanticModel);
+				var can = CanHaveConfigureAwait(node, semanticModel);
 				var problem = can
 					? CheckerProblem.MissingConfigureAwaitFalse
 					: CheckerProblem.NoProblem;
@@ -64,56 +87,101 @@ namespace ConfigureAwaitChecker.Lib
 			}
 		}
 
-		public static (ExpressionSyntax, InvocationExpressionSyntax) FindExpressionForConfigureAwait(SyntaxNode node)
+		public static (InvocationExpressionSyntax, ExpressionSyntax) FindExpressionFor(AwaitExpressionSyntax awaitNode)
 		{
-			var fullParent = node.Parent.Parent.ChildNodes().ToList();
-			if (fullParent.Count == 2 && fullParent[0] == node.Parent)
+			static (InvocationExpressionSyntax, ExpressionSyntax) Helper(SyntaxNode node, AwaitExpressionSyntax awaitNode)
 			{
-				if (fullParent[1] is ForEachStatementSyntax forEachStatementSyntax)
+				foreach (var item in node.ChildNodes())
 				{
-					var f = forEachStatementSyntax.ChildNodes().Skip(1).First();
-					if (f is InvocationExpressionSyntax e1)
-					{
-						return (e1.Expression, e1);
-					}
-					else if (f is AwaitExpressionSyntax e2)
-					{
-						return (e2, null);
-					}
-					return (null, null);
+					if (item is InvocationExpressionSyntax invocationExpressionSyntax)
+						return (invocationExpressionSyntax, awaitNode.Expression);
+					return Helper(item, awaitNode);
 				}
-				if (fullParent[1] is UsingStatementSyntax usingStatementSyntax)
+				return (null, awaitNode.Expression);
+			}
+
+			return Helper(awaitNode, awaitNode);
+		}
+
+		public static CheckerResult CheckNode(UsingStatementSyntax usingNode, SemanticModel semanticModel)
+		{
+			var location = usingNode.GetLocation();
+			if (usingNode.AwaitKeyword == default)
+				return null;
+			var (possibleConfigureAwait, node) = FindExpressionFor(usingNode);
+			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
+			{
+				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
 				{
-					var u = usingStatementSyntax.ChildNodes().First();
-					if (u is VariableDeclarationSyntax e1)
-					{
+					return new CheckerResult(CheckerProblem.NoProblem, location);
+				}
+				else
+				{
+					return new CheckerResult(CheckerProblem.ConfigureAwaitWithTrue, location);
+				}
+			}
+			else
+			{
+				var can = CanHaveConfigureAwait(node, semanticModel);
+				var problem = can
+					? CheckerProblem.MissingConfigureAwaitFalse
+					: CheckerProblem.NoProblem;
+				return new CheckerResult(problem, location);
+			}
+		}
+
+		public static (InvocationExpressionSyntax, ExpressionSyntax) FindExpressionFor(UsingStatementSyntax usingNode)
+		{
+			if (usingNode.Declaration != null)
+			{
 #warning Should be extended to handle all variables
-						foreach (var variable in e1.Variables)
-						{
-							if (variable.Initializer.Value is InvocationExpressionSyntax invocationExpressionSyntax)
-								return (invocationExpressionSyntax.Expression, invocationExpressionSyntax);
-							if (variable.Initializer.Value is AwaitExpressionSyntax awaitExpressionSyntax)
-								return (awaitExpressionSyntax, null);
-						}
-					}
-					else if (u is InvocationExpressionSyntax e2)
-					{
-						return (e2.Expression, e2);
-					}
-					else if (u is AwaitExpressionSyntax e3)
-					{
-						return (e3, null);
-					}
-					return (null, null);
+				var initializer = usingNode.Declaration.Variables.First().Initializer.Value;
+				if (initializer is InvocationExpressionSyntax invocationExpressionSyntax)
+					return (invocationExpressionSyntax, initializer);
+				return (null, initializer);
+			}
+			else
+			{
+				var expression = usingNode.Expression;
+				if (expression is InvocationExpressionSyntax invocationExpressionSyntax)
+					return (invocationExpressionSyntax, expression);
+				return (null, expression);
+			}
+		}
+
+		public static CheckerResult CheckNode(ForEachStatementSyntax forEachNode, SemanticModel semanticModel)
+		{
+			var location = forEachNode.GetLocation();
+			if (forEachNode.AwaitKeyword == default)
+				return null;
+			var (possibleConfigureAwait, node) = FindExpressionFor(forEachNode);
+			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
+			{
+				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
+				{
+					return new CheckerResult(CheckerProblem.NoProblem, location);
+				}
+				else
+				{
+					return new CheckerResult(CheckerProblem.ConfigureAwaitWithTrue, location);
 				}
 			}
-			foreach (var item in node.ChildNodes())
+			else
 			{
-				if (item is InvocationExpressionSyntax invocationExpressionSyntax)
-					return (invocationExpressionSyntax.Expression, invocationExpressionSyntax);
-				return FindExpressionForConfigureAwait(item);
+				var can = CanHaveConfigureAwait(node, semanticModel);
+				var problem = can
+					? CheckerProblem.MissingConfigureAwaitFalse
+					: CheckerProblem.NoProblem;
+				return new CheckerResult(problem, location);
 			}
-			return (null, null);
+		}
+
+		public static (InvocationExpressionSyntax, ExpressionSyntax) FindExpressionFor(ForEachStatementSyntax forEachNode)
+		{
+			var expression = forEachNode.Expression;
+			if (expression is InvocationExpressionSyntax invocationExpressionSyntax)
+				return (invocationExpressionSyntax, expression);
+			return (null, expression);
 		}
 
 		public static bool CanHaveConfigureAwait(ExpressionSyntax expression, SemanticModel semanticModel)
@@ -154,18 +222,6 @@ namespace ConfigureAwaitChecker.Lib
 			if (!argumentList.Arguments[0].Expression.IsKind(SyntaxKind.FalseLiteralExpression))
 				return false;
 			return true;
-		}
-
-		static SyntaxTree ParseFile(Stream file, LanguageVersion languageVersion)
-		{
-			using (var reader = new StreamReader(file, Encoding.UTF8, true, 16 * 1024, true))
-			{
-				return CSharpSyntaxTree.ParseText(reader.ReadToEnd(),
-					options: new CSharpParseOptions(
-						languageVersion: languageVersion,
-						documentationMode: DocumentationMode.None,
-						kind: SourceCodeKind.Regular));
-			}
 		}
 	}
 }

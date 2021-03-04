@@ -4,11 +4,12 @@ using ConfigureAwaitChecker.Tests;
 
 [CheckerTests.ExpectedResult(CheckerProblem.MissingConfigureAwaitFalse)]
 [CodeFixTests.TestThis]
-public class AwaitUsing_Missing
+public class AwaitUsingVariableWithoutVar_Missing
 {
 	public async Task FooBar()
 	{
-		await using (var _ = TestsBase.AsyncDisposable())
+		var x = TestsBase.AsyncDisposable();
+		await using (x)
 		{ }
 	}
 }

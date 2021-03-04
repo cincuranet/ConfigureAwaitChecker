@@ -25,13 +25,36 @@ namespace ConfigureAwaitChecker.Analyzer
 		{
 			context.EnableConcurrentExecution();
 			context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-			context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.AwaitExpression);
+			context.RegisterSyntaxNodeAction(AnalyzeAwait, SyntaxKind.AwaitExpression);
+			context.RegisterSyntaxNodeAction(AnalyzeUsing, SyntaxKind.UsingStatement);
+			context.RegisterSyntaxNodeAction(AnalyzeForEach, SyntaxKind.ForEachStatement);
 		}
 
-		static void Analyze(SyntaxNodeAnalysisContext context)
+		static void AnalyzeAwait(SyntaxNodeAnalysisContext context)
 		{
-			var awaitNode = (AwaitExpressionSyntax)context.Node;
-			var check = Checker.CheckNode(awaitNode, context.SemanticModel);
+			var node = (AwaitExpressionSyntax)context.Node;
+			var check = Checker.CheckNode(node, context.SemanticModel);
+			ProcessResult(context, check);
+		}
+
+		static void AnalyzeUsing(SyntaxNodeAnalysisContext context)
+		{
+			var node = (UsingStatementSyntax)context.Node;
+			var check = Checker.CheckNode(node, context.SemanticModel);
+			ProcessResult(context, check);
+		}
+
+		static void AnalyzeForEach(SyntaxNodeAnalysisContext context)
+		{
+			var node = (ForEachStatementSyntax)context.Node;
+			var check = Checker.CheckNode(node, context.SemanticModel);
+			ProcessResult(context, check);
+		}
+
+		static void ProcessResult(SyntaxNodeAnalysisContext context, CheckerResult check)
+		{
+			if (check == null)
+				return;
 			if (check.NeedsFix)
 			{
 				switch (check.Problem)

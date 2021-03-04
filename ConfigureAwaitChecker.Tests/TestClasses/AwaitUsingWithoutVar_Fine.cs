@@ -3,11 +3,11 @@ using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
 
 [CheckerTests.ExpectedResult(CheckerProblem.NoProblem)]
-public class AwaitForEach_Fine
+public class AwaitUsingWithoutVar_Fine
 {
 	public async Task FooBar()
 	{
-		await foreach (var item in TestsBase.AsyncEnumerable().ConfigureAwait(false))
+		await using (TestsBase.AsyncDisposable().ConfigureAwait(false))
 		{ }
 	}
 }

@@ -4,8 +4,7 @@ using ConfigureAwaitChecker.Lib;
 using ConfigureAwaitChecker.Tests;
 
 [CheckerTests.ExpectedResult(CheckerProblem.NoProblem, CheckerProblem.NoProblem)]
-[CodeFixTests.TestThis]
-public class AwaitForeach2_Fine
+public class AwaitForEachAwaitInside_Fine
 {
 	public async Task FooBar()
 	{

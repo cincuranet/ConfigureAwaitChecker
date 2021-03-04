@@ -5,7 +5,7 @@ using ConfigureAwaitChecker.Tests;
 
 [CheckerTests.ExpectedResult(CheckerProblem.MissingConfigureAwaitFalse, CheckerProblem.NoProblem)]
 [CodeFixTests.TestThis]
-public class AwaitUsing3_Missing
+public class AwaitUsingAwaitInsideWithoutVar_Missing
 {
 	public async Task FooBar()
 	{
