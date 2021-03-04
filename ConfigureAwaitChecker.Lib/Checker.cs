@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -41,10 +42,10 @@ namespace ConfigureAwaitChecker.Lib
 		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode, SemanticModel semanticModel)
 		{
 			var location = awaitNode.GetLocation();
-			var possibleConfigureAwait = FindExpressionForConfigureAwait(awaitNode);
-			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
+			var (expression, invocation) = FindExpressionForConfigureAwait(awaitNode);
+			if (expression != null && IsConfigureAwait(expression))
 			{
-				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
+				if (HasFalseArgument(invocation.ArgumentList))
 				{
 					return new CheckerResult(CheckerProblem.NoProblem, location);
 				}
@@ -55,7 +56,7 @@ namespace ConfigureAwaitChecker.Lib
 			}
 			else
 			{
-				var can = CanHaveConfigureAwait(awaitNode.Expression, semanticModel);
+				var can = CanHaveConfigureAwait(invocation ?? expression ?? awaitNode.Expression, semanticModel);
 				var problem = can
 					? CheckerProblem.MissingConfigureAwaitFalse
 					: CheckerProblem.NoProblem;
@@ -63,15 +64,56 @@ namespace ConfigureAwaitChecker.Lib
 			}
 		}
 
-		public static InvocationExpressionSyntax FindExpressionForConfigureAwait(SyntaxNode node)
+		public static (ExpressionSyntax, InvocationExpressionSyntax) FindExpressionForConfigureAwait(SyntaxNode node)
 		{
+			var fullParent = node.Parent.Parent.ChildNodes().ToList();
+			if (fullParent.Count == 2 && fullParent[0] == node.Parent)
+			{
+				if (fullParent[1] is ForEachStatementSyntax forEachStatementSyntax)
+				{
+					var f = forEachStatementSyntax.ChildNodes().Skip(1).First();
+					if (f is InvocationExpressionSyntax e1)
+					{
+						return (e1.Expression, e1);
+					}
+					else if (f is AwaitExpressionSyntax e2)
+					{
+						return (e2, null);
+					}
+					return (null, null);
+				}
+				if (fullParent[1] is UsingStatementSyntax usingStatementSyntax)
+				{
+					var u = usingStatementSyntax.ChildNodes().First();
+					if (u is VariableDeclarationSyntax e1)
+					{
+#warning Should be extended to handle all variables
+						foreach (var variable in e1.Variables)
+						{
+							if (variable.Initializer.Value is InvocationExpressionSyntax invocationExpressionSyntax)
+								return (invocationExpressionSyntax.Expression, invocationExpressionSyntax);
+							if (variable.Initializer.Value is AwaitExpressionSyntax awaitExpressionSyntax)
+								return (awaitExpressionSyntax, null);
+						}
+					}
+					else if (u is InvocationExpressionSyntax e2)
+					{
+						return (e2.Expression, e2);
+					}
+					else if (u is AwaitExpressionSyntax e3)
+					{
+						return (e3, null);
+					}
+					return (null, null);
+				}
+			}
 			foreach (var item in node.ChildNodes())
 			{
 				if (item is InvocationExpressionSyntax invocationExpressionSyntax)
-					return invocationExpressionSyntax;
+					return (invocationExpressionSyntax.Expression, invocationExpressionSyntax);
 				return FindExpressionForConfigureAwait(item);
 			}
-			return null;
+			return (null, null);
 		}
 
 		public static bool CanHaveConfigureAwait(ExpressionSyntax expression, SemanticModel semanticModel)

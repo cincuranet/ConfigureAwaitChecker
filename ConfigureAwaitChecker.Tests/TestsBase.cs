@@ -15,6 +15,8 @@ namespace ConfigureAwaitChecker.Tests
 			MetadataReference.CreateFromFile(typeof(Checker).Assembly.Location),
 			MetadataReference.CreateFromFile(typeof(Task).Assembly.Location),
 			MetadataReference.CreateFromFile(typeof(ValueTask).Assembly.Location),
+			MetadataReference.CreateFromFile(typeof(IAsyncEnumerable<>).Assembly.Location),
+			MetadataReference.CreateFromFile(typeof(IAsyncDisposable).Assembly.Location),
 			// to force System.Runtime
 			MetadataReference.CreateFromFile(typeof(WaitHandleExtensions).Assembly.Location),
 		};
@@ -47,6 +49,16 @@ namespace ConfigureAwaitChecker.Tests
 		public static ValueTask ValueTask()
 		{
 			return new ValueTask();
+		}
+
+		public static IAsyncEnumerable<int> AsyncEnumerable()
+		{
+			return default;
+		}
+
+		public static IAsyncDisposable AsyncDisposable()
+		{
+			return default;
 		}
 	}
 }

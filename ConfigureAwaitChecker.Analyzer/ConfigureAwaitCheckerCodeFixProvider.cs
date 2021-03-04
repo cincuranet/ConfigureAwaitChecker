@@ -39,43 +39,53 @@ namespace ConfigureAwaitChecker.Analyzer
 		static async Task<Document> Fix(Document document, AwaitExpressionSyntax node, CancellationToken cancellationToken)
 		{
 			var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-			var expression = Checker.FindExpressionForConfigureAwait(node);
-			if (expression != null)
+			var (expression, invocation) = Checker.FindExpressionForConfigureAwait(node);
+			if (invocation != null)
 			{
-				if (!Checker.IsConfigureAwait(expression.Expression))
+				if (!Checker.IsConfigureAwait(invocation.Expression))
 				{
 					var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
 					var newExpression = SyntaxFactory.InvocationExpression(
-						SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, expression, SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
+						SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, invocation, SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
 						SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
-					return document.WithSyntaxRoot(root.ReplaceNode(expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
+					return document.WithSyntaxRoot(root.ReplaceNode(invocation, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
 				}
-				if (!Checker.HasFalseArgument(expression.ArgumentList))
+				if (!Checker.HasFalseArgument(invocation.ArgumentList))
 				{
 					var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
-					var newExpression = SyntaxFactory.InvocationExpression(expression.Expression,
+					var newExpression = SyntaxFactory.InvocationExpression(invocation.Expression,
 						SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
-					return document.WithSyntaxRoot(root.ReplaceNode(expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
+					return document.WithSyntaxRoot(root.ReplaceNode(invocation, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
 				}
+			}
+			else if (expression != null)
+			{
+#warning Should properly handle "await using"
+				var e = expression;
+				if (e.IsKind(SyntaxKind.AwaitExpression))
+				{
+					e = SyntaxFactory.ParenthesizedExpression(e);
+				}
+				var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
+				var newExpression = SyntaxFactory.InvocationExpression(
+					SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, e, SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
+					SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
+				return document.WithSyntaxRoot(root.ReplaceNode(expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
 			}
 			else
 			{
+				var e = node.Expression;
+				if (e.IsKind(SyntaxKind.CastExpression))
+				{
+					e = SyntaxFactory.ParenthesizedExpression(e);
+				}
 				var falseExpression = SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression);
 				var newExpression = SyntaxFactory.InvocationExpression(
-					SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, PrepareNodeExpressionForConfigureAwait(node.Expression), SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
+					SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, e, SyntaxFactory.IdentifierName(Checker.ConfigureAwaitIdentifier)),
 					SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(falseExpression) })));
 				return document.WithSyntaxRoot(root.ReplaceNode(node.Expression, newExpression.WithAdditionalAnnotations(Formatter.Annotation)));
 			}
 			throw new InvalidOperationException();
-		}
-
-		static ExpressionSyntax PrepareNodeExpressionForConfigureAwait(ExpressionSyntax expression)
-		{
-			if (expression.IsKind(SyntaxKind.CastExpression))
-			{
-				return SyntaxFactory.ParenthesizedExpression(expression);
-			}
-			return expression;
 		}
 	}
 }
