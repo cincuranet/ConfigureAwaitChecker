@@ -93,6 +93,7 @@ namespace ConfigureAwaitChecker.Analyzer
 
 		static async Task<Document> Fix(Document document, UsingStatementSyntax node, CancellationToken cancellationToken)
 		{
+#warning Adding ConfigureAwait might result in different variable type and hence should be probably extracted outside
 			var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 			var (invocation, expression) = Checker.FindExpressionFor(node);
 			if (invocation != null)
