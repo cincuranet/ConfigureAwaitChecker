@@ -33,7 +33,9 @@ namespace ConfigureAwaitChecker.Lib
 				switch (item)
 				{
 					case AwaitExpressionSyntax awaitNode:
-						yield return CheckNode(awaitNode, semanticModel);
+						var awaitNodeResult = CheckNode(awaitNode, semanticModel);
+						if (awaitNodeResult != null)
+							yield return awaitNodeResult;
 						break;
 					case UsingStatementSyntax usingNode:
 						var usingNodeResult = CheckNode(usingNode, semanticModel);
