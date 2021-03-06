@@ -40,6 +40,11 @@ namespace ConfigureAwaitChecker.Lib
 						if (usingNodeResult != null)
 							yield return usingNodeResult;
 						break;
+					case LocalDeclarationStatementSyntax localDeclarationNode:
+						var localDeclarationNodeResult = CheckNode(localDeclarationNode, semanticModel);
+						if (localDeclarationNodeResult != null)
+							yield return localDeclarationNodeResult;
+						break;
 					case ForEachStatementSyntax forEachNode:
 						var forEachNodeResult = CheckNode(forEachNode, semanticModel);
 						if (forEachNodeResult != null)
@@ -65,7 +70,7 @@ namespace ConfigureAwaitChecker.Lib
 		public static CheckerResult CheckNode(AwaitExpressionSyntax awaitNode, SemanticModel semanticModel)
 		{
 			var location = awaitNode.GetLocation();
-			var (possibleConfigureAwait, node) = FindExpressionFor(awaitNode);
+			var (possibleConfigureAwait, node) = FindNodeFor(awaitNode);
 			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
 			{
 				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
@@ -87,7 +92,7 @@ namespace ConfigureAwaitChecker.Lib
 			}
 		}
 
-		public static (InvocationExpressionSyntax, ExpressionSyntax) FindExpressionFor(AwaitExpressionSyntax awaitNode)
+		public static (InvocationExpressionSyntax, ExpressionSyntax) FindNodeFor(AwaitExpressionSyntax awaitNode)
 		{
 			static (InvocationExpressionSyntax, ExpressionSyntax) Helper(SyntaxNode node, AwaitExpressionSyntax awaitNode)
 			{
@@ -108,7 +113,7 @@ namespace ConfigureAwaitChecker.Lib
 			var location = usingNode.GetLocation();
 			if (usingNode.AwaitKeyword == default)
 				return null;
-			var (possibleConfigureAwait, node) = FindExpressionFor(usingNode);
+			var (possibleConfigureAwait, node) = FindNodeFor(usingNode);
 			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
 			{
 				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
@@ -130,7 +135,7 @@ namespace ConfigureAwaitChecker.Lib
 			}
 		}
 
-		public static (InvocationExpressionSyntax, ExpressionSyntax) FindExpressionFor(UsingStatementSyntax usingNode)
+		public static (InvocationExpressionSyntax, ExpressionSyntax) FindNodeFor(UsingStatementSyntax usingNode)
 		{
 			if (usingNode.Declaration != null)
 			{
@@ -149,12 +154,12 @@ namespace ConfigureAwaitChecker.Lib
 			}
 		}
 
-		public static CheckerResult CheckNode(ForEachStatementSyntax forEachNode, SemanticModel semanticModel)
+		public static CheckerResult CheckNode(LocalDeclarationStatementSyntax localDeclarationNode, SemanticModel semanticModel)
 		{
-			var location = forEachNode.GetLocation();
-			if (forEachNode.AwaitKeyword == default)
+			var location = localDeclarationNode.GetLocation();
+			if (localDeclarationNode.AwaitKeyword == default)
 				return null;
-			var (possibleConfigureAwait, node) = FindExpressionFor(forEachNode);
+			var (possibleConfigureAwait, node) = FindNodeFor(localDeclarationNode);
 			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
 			{
 				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
@@ -176,7 +181,43 @@ namespace ConfigureAwaitChecker.Lib
 			}
 		}
 
-		public static (InvocationExpressionSyntax, ExpressionSyntax) FindExpressionFor(ForEachStatementSyntax forEachNode)
+		public static (InvocationExpressionSyntax, ExpressionSyntax) FindNodeFor(LocalDeclarationStatementSyntax localDeclarationNode)
+		{
+#warning Should be extended to handle all variables
+			var expression = localDeclarationNode.Declaration.Variables.First().Initializer.Value;
+			if (expression is InvocationExpressionSyntax invocationExpressionSyntax)
+				return (invocationExpressionSyntax, expression);
+			return (null, expression);
+		}
+
+		public static CheckerResult CheckNode(ForEachStatementSyntax forEachNode, SemanticModel semanticModel)
+		{
+			var location = forEachNode.GetLocation();
+			if (forEachNode.AwaitKeyword == default)
+				return null;
+			var (possibleConfigureAwait, node) = FindNodeFor(forEachNode);
+			if (possibleConfigureAwait != null && IsConfigureAwait(possibleConfigureAwait.Expression))
+			{
+				if (HasFalseArgument(possibleConfigureAwait.ArgumentList))
+				{
+					return new CheckerResult(CheckerProblem.NoProblem, location);
+				}
+				else
+				{
+					return new CheckerResult(CheckerProblem.ConfigureAwaitWithTrue, location);
+				}
+			}
+			else
+			{
+				var can = CanHaveConfigureAwait(node, semanticModel);
+				var problem = can
+					? CheckerProblem.MissingConfigureAwaitFalse
+					: CheckerProblem.NoProblem;
+				return new CheckerResult(problem, location);
+			}
+		}
+
+		public static (InvocationExpressionSyntax, ExpressionSyntax) FindNodeFor(ForEachStatementSyntax forEachNode)
 		{
 			var expression = forEachNode.Expression;
 			if (expression is InvocationExpressionSyntax invocationExpressionSyntax)

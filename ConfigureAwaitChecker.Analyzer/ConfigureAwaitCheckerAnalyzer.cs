@@ -27,6 +27,7 @@ namespace ConfigureAwaitChecker.Analyzer
 			context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 			context.RegisterSyntaxNodeAction(AnalyzeAwait, SyntaxKind.AwaitExpression);
 			context.RegisterSyntaxNodeAction(AnalyzeUsing, SyntaxKind.UsingStatement);
+			context.RegisterSyntaxNodeAction(AnalyzeLocalDeclaration, SyntaxKind.LocalDeclarationStatement);
 			context.RegisterSyntaxNodeAction(AnalyzeForEach, SyntaxKind.ForEachStatement);
 		}
 
@@ -40,6 +41,13 @@ namespace ConfigureAwaitChecker.Analyzer
 		static void AnalyzeUsing(SyntaxNodeAnalysisContext context)
 		{
 			var node = (UsingStatementSyntax)context.Node;
+			var check = Checker.CheckNode(node, context.SemanticModel);
+			ProcessResult(context, check);
+		}
+
+		static void AnalyzeLocalDeclaration(SyntaxNodeAnalysisContext context)
+		{
+			var node = (LocalDeclarationStatementSyntax)context.Node;
 			var check = Checker.CheckNode(node, context.SemanticModel);
 			ProcessResult(context, check);
 		}
