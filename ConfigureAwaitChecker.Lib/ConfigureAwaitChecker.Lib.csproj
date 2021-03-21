@@ -9,6 +9,7 @@
 		<PackageVersion>$(Version)</PackageVersion>
 		<Authors>Jiří Činčura</Authors>
 		<PackageProjectUrl>https://github.com/cincuranet/ConfigureAwaitChecker</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<Description>Library to check for `ConfigureAwait(false)` usage.
 
